@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8c5676af6524494b9c19c82d7dd7971, type: 3}
+  m_Name: UiConfig
+  m_EditorClassIdentifier: 
+  _rootCanvas: {fileID: 900534070853962534, guid: acc056fe4f6ebe44c889537c1229fdf8, type: 3}
+  _shipSetupMenu: {fileID: 8113883743699608778, guid: c6c38ef2697dcd641b1615c572bc72cb, type: 3}
+  _equipSlotUiPrefab: {fileID: 7680989543203452689, guid: 1b9a7255ee876f34f83c9e486046c353, type: 3}
