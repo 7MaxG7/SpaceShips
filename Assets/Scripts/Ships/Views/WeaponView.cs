@@ -1,15 +1,11 @@
-﻿using Abstractions.Ships;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Ships.Views
 {
-    public class WeaponView : MonoBehaviour, IWeaponView
+    public class WeaponView : MonoBehaviour
     {
         [SerializeField] private Transform _barrel;
-        [SerializeField] private Transform _shootDirection;
 
         public Transform Barrel => _barrel;
-
-        public Transform ShootDirection => _shootDirection;
     }
 }

@@ -5,15 +5,14 @@ using UnityEngine;
 
 namespace Abstractions.Ships
 {
-    internal interface IAmmo : ICleaner
+    public interface IAmmo : ICleaner
     {
-        event Action<IAmmo> OnTargetReached;
+        event Action<IAmmo, IWeapon, IDamagableView> OnReachedDamagable;
         
         WeaponType WeaponType { get; }
-        Transform Transform { get; }
         Rigidbody2D Rigidbody { get; }
 
-        void Activate(Transform source);
+        void Activate(Transform startPosition, IWeapon shooter);
         void Deactivate();
     }
 }

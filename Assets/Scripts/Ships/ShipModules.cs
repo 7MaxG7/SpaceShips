@@ -7,27 +7,23 @@ namespace Ships
 {
     internal class ShipModules : AbstractEquipments<IModule, ModuleType>, IShipModules
     {
-        public event Action<IModule> OnModuleInstall;
-        public event Action<IModule> OnModuleUninstall;
+        public event Action<IModule> OnModuleEquiped;
+        public event Action<IModule> OnModuleUnequip;
 
 
-        public ShipModules(int amount, IModuleFactory moduleFactory)
-        {
-            MaxEquipmentsAmount = amount;
-            EquipmentsFactory = moduleFactory;
-        }
+        public ShipModules(int amount, IModuleFactory moduleFactory) : base(amount, moduleFactory) { }
 
         public override void SetEquipment(int index, ModuleType equipType)
         {
             base.SetEquipment(index, equipType);
-            Equipments[index].OnModuleUninstall += InvokeModuleUninstall;
-            OnModuleInstall?.Invoke(Equipments[index]);
+            Equipments[index].OnModuleUnequip += InvokeModuleUninstall;
+            OnModuleEquiped?.Invoke(Equipments[index]);
         }
 
         private void InvokeModuleUninstall(IModule module)
         {
-            module.OnModuleUninstall -= InvokeModuleUninstall;
-            OnModuleUninstall?.Invoke(module);
+            module.OnModuleUnequip -= InvokeModuleUninstall;
+            OnModuleUnequip?.Invoke(module);
         }
     }
 }

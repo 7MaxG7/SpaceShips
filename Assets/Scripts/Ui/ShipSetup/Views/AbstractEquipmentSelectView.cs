@@ -1,22 +1,25 @@
 ﻿using System;
 using Enums;
+using Infrastructure;
 using UnityEngine;
 
 namespace Ui.ShipSetup
 {
-    public abstract class AbstractEquipmentSelectView<T> : MonoBehaviour where T : Enum
+    public abstract class AbstractEquipmentSelectView<T> : MonoBehaviour, ICleaner where T : Enum
     {
         [SerializeField] private AbstractEquipmentSlotUiView<T>[] _componentSlots;
+        public event Action<OpponentId, int, T> OnEquipmentSelect;
+
         private OpponentId _opponentId;
         private int _slotIndex;
-        public event Action<OpponentId, int, T> OnComponentSelect;
-
+        
+        
         public void Init()
         {
-            foreach (var componentSlot in _componentSlots)
+            foreach (var equipmentSlot in _componentSlots)
             {
-                componentSlot.Init();
-                componentSlot.OnSlotClick += InvokeComponentSelect;
+                equipmentSlot.Init();
+                equipmentSlot.OnSlotClick += InvokeEquipmentSelect;
             }
         }
 
@@ -32,9 +35,13 @@ namespace Ui.ShipSetup
         public void Hide()
             => gameObject.SetActive(false);
 
-        private void InvokeComponentSelect(T componentType)
+        public void CleanUp()
         {
-            OnComponentSelect?.Invoke(_opponentId, _slotIndex, componentType);
+            foreach (var equipmentSlot in _componentSlots) 
+                equipmentSlot.OnSlotClick -= InvokeEquipmentSelect;
         }
+
+        private void InvokeEquipmentSelect(T componentType)
+            => OnEquipmentSelect?.Invoke(_opponentId, _slotIndex, componentType);
     }
 }

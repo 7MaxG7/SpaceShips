@@ -1,18 +1,18 @@
 ﻿using Enums;
-using Infrastructure;
-using UnityEngine;
+using Ships.Views;
 
 namespace Abstractions.Ships
 {
-    public interface IWeapon : ICleaner
+    public interface IWeapon : IEquipment
     {
         bool IsReady { get; }
         WeaponType WeaponType { get; }
-        Transform AmmoBarrel { get; }
-        Vector2 ShootDirection { get; }
 
+        void Init(IShip owner);
         void Shoot();
         void ReduceCooldown(float deltaTime);
-        void CleanUp();
+        void SetView(WeaponView view);
+        bool TryDealDamage(IShip target);
+        void Reload();
     }
 }

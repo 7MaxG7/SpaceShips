@@ -5,7 +5,7 @@ using Ships;
 
 namespace Abstractions.Ships
 {
-    internal interface IShip : ICleaner
+    public interface IShip : ICleaner
     {
         event Action<IShip> OnDied;
         
@@ -13,7 +13,10 @@ namespace Abstractions.Ships
         IHealth Health { get; }
         IWeaponBattery WeaponBattery { get; }
         IShipModules ShipModules { get; }
+        string Name { get; }
 
         void SetView(ShipView shipView);
+        void TakeDamage(int damage);
+        void Kill();
     }
 }

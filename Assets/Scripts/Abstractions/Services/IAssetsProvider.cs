@@ -10,11 +10,15 @@ namespace Abstractions.Services
 {
     internal interface IAssetsProvider
     {
+        CurtainView CreateCurtain();
+        void PrepareSetupShipRoots();
+        void PrepareBattleRoots();
         ShipSetupMenuView CreateShipSetupMenu();
+        BattleUiView CreateBattleUi();
         SoundPlayerView CreateSoundPlayer();
         ShipView CreateShip(ShipType shipType, Vector3 position, Quaternion rotation);
         AmmoView CreateAmmo(WeaponType weaponType);
-        SlotUiView CreateComponentUiSlot(Transform parent);
+        SlotUiView CreateEquipmentUiSlot(Transform parent);
         Sprite GetWeaponIcon(WeaponType weaponType);
         Sprite GetModuleIcon(ModuleType moduleType);
         WeaponView CreateWeapon(WeaponType weaponType, Transform parent);

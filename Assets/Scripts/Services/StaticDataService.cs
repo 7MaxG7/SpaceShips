@@ -3,8 +3,6 @@ using System.Linq;
 using Abstractions.Services;
 using Configs.Data;
 using Enums;
-using Ships;
-using Ships.Views;
 using UnityEngine;
 using Utils;
 
@@ -30,35 +28,19 @@ namespace Services
                 .ToDictionary(data => data.ModuleType, data => data);
         }
 
-        public ShipView GetShipPrefab(ShipType shipType)
-        {
-            return GetShipData(shipType).Prefab;
-        }
-
-        public AmmoView GetAmmoPrefab(WeaponType weaponType)
-        {
-            return GetWeaponData(weaponType).AmmoPrefab;
-        }
-
-        public ShipData GetShipData(ShipType shipType)
-        {
-            return _shipDatas.TryGetValue(shipType, out var data)
+        public ShipData GetShipData(ShipType shipType) 
+            => _shipDatas.TryGetValue(shipType, out var data)
                 ? data
                 : null;
-        }
 
         public WeaponData GetWeaponData(WeaponType weapon)
-        {
-            return _weaponDatas.TryGetValue(weapon, out var data)
+            => _weaponDatas.TryGetValue(weapon, out var data)
                 ? data
                 : null;
-        }
 
         public ModuleData GetModuleData(ModuleType module)
-        {
-            return _moduleDatas.TryGetValue(module, out var data)
+            => _moduleDatas.TryGetValue(module, out var data)
                 ? data
                 : null;
-        }
     }
 }

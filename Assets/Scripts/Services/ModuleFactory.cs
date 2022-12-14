@@ -23,8 +23,15 @@ namespace Services
         public IModule CreateEquipment(ModuleType moduleType, Transform parent)
         {
             var moduleData = _staticDataService.GetModuleData(moduleType);
-            var moduleView = _assetsProvider.CreateModule(moduleType, parent);
-            return new Module(moduleView, moduleData.EffectType, moduleData.MathType, moduleData.Value, moduleData.ModuleType);
+            var module = new Module(moduleData.EffectType, moduleData.MathType, moduleData.Value, moduleData.ModuleType);
+            GenerateView(module, parent);
+            return module;
+        }
+
+        public void GenerateView(IModule module, Transform parent)
+        {
+            var view = _assetsProvider.CreateModule(module.ModuleType, parent);
+            module.SetView(view);
         }
     }
 }

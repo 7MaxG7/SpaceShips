@@ -13,6 +13,7 @@ namespace Services
         private readonly IAssetsProvider _assetsProvider;
         private readonly IAmmoPool _ammoPool;
 
+        
         [Inject]
         public WeaponFactory(IStaticDataService staticDataService, IAssetsProvider assetsProvider, IAmmoPool ammoPool)
         {
@@ -24,8 +25,15 @@ namespace Services
         public IWeapon CreateEquipment(WeaponType weaponType, Transform parent)
         {
             var weaponData = _staticDataService.GetWeaponData(weaponType);
-            var weaponView = _assetsProvider.CreateWeapon(weaponType, parent);
-            return new Weapon(weaponView, weaponData.Cooldown, weaponData.Damage, weaponType, _ammoPool);
+            var weapon = new Weapon(weaponData.Cooldown, weaponData.Damage, weaponData.AmmoSpeed, weaponType, _ammoPool);
+            GenerateView(weapon, parent);
+            return weapon;
+        }
+
+        public void GenerateView(IWeapon weapon, Transform parent)
+        {
+            var view = _assetsProvider.CreateWeapon(weapon.WeaponType, parent);
+            weapon.SetView(view);
         }
     }
 }

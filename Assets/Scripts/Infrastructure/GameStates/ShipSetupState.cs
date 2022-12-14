@@ -1,8 +1,8 @@
 ﻿using System;
 using Abstractions;
+using Abstractions.Services;
 using Abstractions.Ui;
-using Services;
-using Utils;
+using Sounds;
 using Zenject;
 
 
@@ -12,42 +12,48 @@ namespace Infrastructure
     {
         public event Action OnStateChange;
 
-        private readonly ISceneLoader _sceneLoader;
         private readonly IShipSetupMenuController _shipSetupMenuController;
+        private readonly ICurtain _curtain;
         private readonly IShipsInitializer _shipsInitializer;
+        private readonly IAssetsProvider _assetsProvider;
+        private readonly ISoundPlayer _soundPlayer;
 
 
         [Inject]
-        public ShipSetupState(ISceneLoader sceneLoader, IShipSetupMenuController shipSetupMenuController
-            , IShipsInitializer shipsInitializer)
+        public ShipSetupState(ICurtain curtain, IShipSetupMenuController shipSetupMenuController
+            , IShipsInitializer shipsInitializer, IAssetsProvider assetsProvider, ISoundPlayer soundPlayer)
         {
+            _curtain = curtain;
             _shipsInitializer = shipsInitializer;
-            _sceneLoader = sceneLoader;
+            _assetsProvider = assetsProvider;
+            _soundPlayer = soundPlayer;
             _shipSetupMenuController = shipSetupMenuController;
         }
 
         public void Enter()
         {
-            _sceneLoader.LoadScene(Constants.SETUP_SCENE_NAME, PrepareSetupScene);
+            PrepareSetupScene();
+            _curtain.HideCurtain();
+            _soundPlayer.PlayMusic();
         }
 
         public void Exit()
         {
             _shipSetupMenuController.OnSetupComplete -= SwitchState;
+            _shipSetupMenuController.CleanUp();
         }
 
         private void PrepareSetupScene()
         {
             _shipsInitializer.PrepareShips();
+            _assetsProvider.PrepareSetupShipRoots();
             _shipSetupMenuController.PrepareUi(_shipsInitializer.Ships);
             _shipSetupMenuController.OnSetupComplete += SwitchState;
         }
 
         private void SwitchState()
         {
-            _shipSetupMenuController.OnSetupComplete -= SwitchState;
-            _shipSetupMenuController.CleanUp();
-            OnStateChange?.Invoke();
+            _curtain.ShowCurtain(callback:() => OnStateChange?.Invoke());
         }
     }
 }

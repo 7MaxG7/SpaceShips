@@ -18,14 +18,10 @@ namespace Services
         }
 
         public void LoadScene(string sceneName, Action onSceneLoadedCallback = null)
-        {
-            _coroutineRunner.StartCoroutine(LoadSceneCoroutine(sceneName, onSceneLoadedCallback));
-        }
+            => _coroutineRunner.StartCoroutine(LoadSceneCoroutine(sceneName, onSceneLoadedCallback));
 
-        public string GetCurrentSceneName()
-        {
-            return SceneManager.GetActiveScene().name;
-        }
+        public string GetCurrentSceneName() 
+            => SceneManager.GetActiveScene().name;
 
         private IEnumerator LoadSceneCoroutine(string sceneName, Action onSceneLoadedCallback)
         {

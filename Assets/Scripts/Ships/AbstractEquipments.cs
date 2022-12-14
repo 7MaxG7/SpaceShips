@@ -1,18 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Abstractions.Services;
-using Infrastructure;
+using Abstractions.Ships;
 using UnityEngine;
 
 namespace Ships
 {
-    internal abstract class AbstractEquipments<TEquipment, TEquipType> where TEquipment : ICleaner
-    {
-        public int MaxEquipmentsAmount { get; protected set; }
-        
-        protected IEquipmentFactory<TEquipment, TEquipType> EquipmentsFactory;
-        protected readonly Dictionary<int, TEquipment> Equipments = new();
-        private readonly Dictionary<int, Transform> _slots = new();
 
+    internal abstract class AbstractEquipments<TEquipment, TEquipType> : IAbstractEquipments<TEquipment, TEquipType>
+        where TEquipment : IEquipment where TEquipType : Enum
+    {
+        public int MaxEquipmentsAmount { get; }
+
+        public IEquipmentFactory<TEquipment, TEquipType> EquipmentsFactory { get; }
+        public Dictionary<int, TEquipment> Equipments { get; } = new();
+        public Dictionary<int, Transform> Slots { get; } = new();
+
+
+        protected AbstractEquipments(int amount, IEquipmentFactory<TEquipment, TEquipType> weaponFactory)
+        {
+            MaxEquipmentsAmount = amount;
+            EquipmentsFactory = weaponFactory;
+        }
+
+        protected AbstractEquipments(IAbstractEquipments<TEquipment, TEquipType> baseEquipments)
+        {
+            MaxEquipmentsAmount = baseEquipments.MaxEquipmentsAmount;
+            Equipments = baseEquipments.Equipments;
+            EquipmentsFactory = baseEquipments.EquipmentsFactory;
+            Slots = baseEquipments.Slots;
+        }
         
         public void SetSlots(Transform[] slots)
         {
@@ -31,12 +48,12 @@ namespace Ships
                 }
 
                 slots[i].gameObject.SetActive(true);
-                _slots[i] = slots[i];
+                Slots[i] = slots[i];
             }
         }
 
         public TEquipment GetEquipment(int index)
-            => Equipments.TryGetValue(index, out var component) ? component : default;
+            => Equipments.TryGetValue(index, out var equipment) ? equipment : default;
 
         public virtual void SetEquipment(int index, TEquipType equipType)
         {
@@ -46,9 +63,12 @@ namespace Ships
             if (!Equipments.TryGetValue(index, out var equipment))
                 Equipments.Add(index, default);
             else
-                equipment?.CleanUp();
+                equipment?.Unequip();
 
-            Equipments[index] = EquipmentsFactory.CreateEquipment(equipType, _slots[index]);
+            Equipments[index] = EquipmentsFactory.CreateEquipment(equipType, Slots[index]);
         }
+
+        public Transform GetSlotTransform(int slotIndex)
+            => Slots.ContainsKey(slotIndex) ? Slots[slotIndex] : null;
     }
 }

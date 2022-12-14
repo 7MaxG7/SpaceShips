@@ -1,7 +1,6 @@
 ﻿using Abstractions.Services;
 using Abstractions.Ships;
 using Configs.Data;
-using Infrastructure;
 using Ships;
 using Ships.Data;
 using UnityEngine;
@@ -15,18 +14,16 @@ namespace Services
         private readonly IWeaponFactory _weaponFactory;
         private readonly IModuleFactory _moduleFactory;
         private readonly IShipUpgrader _shipUpgrader;
-        private readonly IControllersHolder _controllers;
 
 
         [Inject]
         public ShipsFactory(IAssetsProvider assetsProvider, IWeaponFactory weaponFactory, IModuleFactory moduleFactory
-            , IShipUpgrader shipUpgrader, IControllersHolder controllers)
+            , IShipUpgrader shipUpgrader)
         {
             _assetsProvider = assetsProvider;
             _weaponFactory = weaponFactory;
             _moduleFactory = moduleFactory;
             _shipUpgrader = shipUpgrader;
-            _controllers = controllers;
         }
         
         public IShip CreateShip(ShipData shipData, Vector3 position, Quaternion rotation)
@@ -37,10 +34,11 @@ namespace Services
             return ship;
         }
 
-        public void GenerateView(IShip ship, Vector3 position, Quaternion rotation)
+        public IDamagableView GenerateView(IShip ship, Vector3 position, Quaternion rotation)
         {
             var shipView = _assetsProvider.CreateShip(ship.ShipType, position, rotation);
             ship.SetView(shipView);
+            return shipView;
         }
 
         private void CreateShipEquipments(ShipData shipData, out IHealth health, out IWeaponBattery weaponBattery, out IShipModules modules)

@@ -18,8 +18,6 @@ namespace Ui.ShipSetup
         }
 
         private void InvokeSlotClick()
-        {
-            OnSlotClick?.Invoke(_weaponType);
-        }
+            => OnSlotClick?.Invoke(_weaponType);
     }
 }

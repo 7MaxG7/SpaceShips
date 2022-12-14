@@ -15,14 +15,11 @@ namespace Ui
         public Transform WeaponSlotsContent => _weaponSlotsContent;
         public Transform ModuleSlotsContent => _moduleSlotsContent;
 
-        public Transform GetWeaponSelectAnchor(int index)
-        {
-            return _weaponSelectAnchors.Length > index ? _weaponSelectAnchors[index] : null;
-        }
+        
+        public Transform GetWeaponSelectAnchor(int index) 
+            => _weaponSelectAnchors.Length > index ? _weaponSelectAnchors[index] : null;
 
-        public Transform GetModuleSelectAnchor(int index)
-        {
-            return _moduleSelectAnchors.Length > index ? _moduleSelectAnchors[index] : null;
-        }
+        public Transform GetModuleSelectAnchor(int index) 
+            => _moduleSelectAnchors.Length > index ? _moduleSelectAnchors[index] : null;
     }
 }

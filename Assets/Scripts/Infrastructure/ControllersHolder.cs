@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DG.Tweening;
 
 
 namespace Infrastructure
@@ -11,9 +12,7 @@ namespace Infrastructure
         public void OnUpdate(float deltaTime)
         {
             foreach (var updater in _updaters)
-            {
                 updater.OnUpdate(deltaTime);
-            }
         }
 
         public void AddController(IController controller)
@@ -28,18 +27,15 @@ namespace Infrastructure
         {
             if (controller is IUpdater updater)
                 _updaters.Remove(updater);
-            if (controller is ICleaner cleaner)
-                _cleaners.Remove(cleaner);
         }
 
-        public void ClearControllers()
+        public void CleanUp()
         {
             foreach (var cleaner in _cleaners)
-            {
                 cleaner.CleanUp();
-            }
             _cleaners.Clear();
             _updaters.Clear();
+            DOTween.Clear();
         }
     }
 }

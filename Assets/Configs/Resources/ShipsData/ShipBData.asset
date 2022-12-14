@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffa0efaae1e446008998ae2ed295f232, type: 3}
+  m_Name: ShipBData
+  m_EditorClassIdentifier: 
+  _shipType: 2
+  _maxHp: 60
+  _maxShied: 120
+  _shieldRecovery: 1
+  _shieldRecoveryInterval: 1
+  _weaponSlotsAmount: 2
+  _moduleSlotsAmount: 3
+  _prefab: {fileID: 6616281956063515882, guid: b218683e126883c4b9dd6ffb50ba2b0c, type: 3}

@@ -61,6 +61,8 @@ namespace Ui
         {
             _hideAllButton.onClick.RemoveAllListeners();
             _setupCompleteButton.onClick.RemoveAllListeners();
+            _weaponSelectPanel.CleanUp();
+            _moduleSelectPanel.CleanUp();
         }
     }
 }

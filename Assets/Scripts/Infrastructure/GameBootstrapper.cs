@@ -20,14 +20,10 @@ namespace Infrastructure
             DontDestroyOnLoad(this);
         }
 
-        private void Update()
-        {
-            _game.Controllers?.OnUpdate(Time.deltaTime);
-        }
+        private void Update() 
+            => _game.Controllers?.OnUpdate(Time.deltaTime);
 
-        private void OnDestroy()
-        {
-            _game.Controllers.ClearControllers();
-        }
+        private void OnDestroy() 
+            => _game.Controllers.CleanUp();
     }
 }

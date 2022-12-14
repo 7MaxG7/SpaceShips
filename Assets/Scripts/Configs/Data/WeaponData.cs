@@ -12,6 +12,7 @@ namespace Configs.Data
         [SerializeField] private float _cooldown;
         [SerializeField] private WeaponView _prefab;
         [SerializeField] private AmmoView _ammoPrefab;
+        [SerializeField] private float _ammoSpeed;
         [SerializeField] private Sprite _icon;
 
         public WeaponType Weapon => _weapon;
@@ -20,5 +21,7 @@ namespace Configs.Data
         public WeaponView Prefab => _prefab;
         public AmmoView AmmoPrefab => _ammoPrefab;
         public Sprite Icon => _icon;
+
+        public float AmmoSpeed => _ammoSpeed;
     }
 }

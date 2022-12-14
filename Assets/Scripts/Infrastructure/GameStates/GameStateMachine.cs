@@ -12,9 +12,8 @@ namespace Infrastructure
 
 
         [Inject]
-        public GameStateMachine(IGameBootstrapState gameBootstrapState, IShipSetupState shipSetupState,
-            ILoadBattleState loadBattleState
-            , IRunBattleState runBattleState, ILeaveBattleState leaveBattleState)
+        public GameStateMachine(IGameBootstrapState gameBootstrapState, IShipSetupState shipSetupState
+            , ILoadBattleState loadBattleState, IRunBattleState runBattleState, ILeaveBattleState leaveBattleState)
         {
             _states = new Dictionary<Type, IGameState>
             {
@@ -26,21 +25,21 @@ namespace Infrastructure
             };
         }
 
-        public void Dispose()
-        {
-            _currentState = null;
-            _states.Clear();
-        }
-
         public IGameState GetState(Type stateType)
         {
-            return _states[stateType];
+            return _states.TryGetValue(stateType, out var state) ? state : null;
         }
 
         public void Enter<TState>() where TState : class, IGameState
         {
             var newState = SwitchCurrentState<TState>();
             newState.Enter();
+        }
+
+        public void CleanUp()
+        {
+            _currentState = null;
+            _states.Clear();
         }
 
         private TState SwitchCurrentState<TState>() where TState : class, IGameState

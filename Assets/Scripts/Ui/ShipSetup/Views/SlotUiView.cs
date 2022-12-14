@@ -1,10 +1,11 @@
 ﻿using System;
+using Infrastructure;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Ui.ShipSetup
 {
-    public class SlotUiView : MonoBehaviour
+    public class SlotUiView : MonoBehaviour, ICleaner
     {
         [SerializeField] private Button _selectButton;
         [SerializeField] private Image _icon;
@@ -22,15 +23,14 @@ namespace Ui.ShipSetup
             SetIcon(null);
         }
 
-        private void InvokeWeaponSelect()
+        public void CleanUp()
         {
-            OnSlotClick?.Invoke(Index);
-        }
-
-        private void CleanUp()
-        {
+            Index = -1;
             _selectButton.onClick.RemoveAllListeners();
         }
+
+        private void InvokeWeaponSelect() 
+            => OnSlotClick?.Invoke(Index);
 
         public void SetIcon(Sprite icon)
         {

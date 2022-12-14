@@ -36,11 +36,13 @@ namespace Services
                 case EffectType.Hp:
                 case EffectType.ShieldRecovery:
                     var health = DowngradeHealth(ship.Health, module);
-                    ship.SetHealth(health);
+                    if (ship.Health != health)
+                        ship.SetHealth(health);
                     break;
                 case EffectType.ShootCooldown:
                     var weapons = DowngradeWeapons(ship.WeaponBattery, module);
-                    ship.SetWeapons(weapons);
+                    if (ship.WeaponBattery != weapons)
+                        ship.SetWeapons(weapons);
                     break;
                 default:
                     Debug.LogError($"{this}: Unknown module effect type {module.EffectType.ToString()}");
@@ -49,12 +51,7 @@ namespace Services
         }
 
         private IHealth UpgradeHealth(IHealth currentHealth, IModule module)
-        {
-            var health = new UpgradedHealth(currentHealth, module);
-            health.RestoreHp();
-            health.RestoreShield();
-            return health;
-        }
+            => new UpgradedHealth(currentHealth, module);
 
         private IWeaponBattery UpgradeWeapons(IWeaponBattery currentWeaponBattery, IModule module)
             => new UpgradedWeaponsBattery(currentWeaponBattery, module);
