@@ -8,6 +8,7 @@ namespace Configs.Data
     public class ModuleData : ScriptableObject
     {
         [SerializeField] private ModuleType _moduleType;
+        [SerializeField] private bool _isActive;
         [SerializeField] private EffectType _effectType;
         [SerializeField] private MathType _mathType;
         [SerializeField] private float _value;
@@ -19,7 +20,7 @@ namespace Configs.Data
         public MathType MathType => _mathType;
         public float Value => _value;
         public Sprite Icon => _icon;
-
         public ModuleView Prefab => _prefab;
+        public bool IsActive => _isActive;
     }
 }

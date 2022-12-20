@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ModuleCData
   m_EditorClassIdentifier: 
   _moduleType: 3
+  _isActive: 1
   _effectType: 3
   _mathType: 2
   _value: 0.8

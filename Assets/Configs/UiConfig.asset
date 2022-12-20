@@ -15,6 +15,7 @@ MonoBehaviour:
   _curtainPrefab: {fileID: 8468764024276898291, guid: 5e55d30347debec44be9b11a869f4a92, type: 3}
   _rootCanvas: {fileID: 900534070853962534, guid: acc056fe4f6ebe44c889537c1229fdf8, type: 3}
   _shipSetupMenu: {fileID: 8113883743699608778, guid: c6c38ef2697dcd641b1615c572bc72cb, type: 3}
-  _equipSlotUiPrefab: {fileID: 7680989543203452689, guid: 1b9a7255ee876f34f83c9e486046c353, type: 3}
+  _slotUiPrefab: {fileID: 7680989543203452689, guid: 1b9a7255ee876f34f83c9e486046c353, type: 3}
+  _shipSlotUiPrefab: {fileID: 8542075037858826769, guid: a226fd78abc3cab4a85ff4d85ada2e14, type: 3}
   _battleUiPrefab: {fileID: 701415765148122640, guid: 5be8fc0d052d5cf4a954cd74c026ada9, type: 3}
-  _curtainAnimDuration: 1
+  _fadeAnimDuration: 1

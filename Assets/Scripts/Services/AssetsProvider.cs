@@ -70,8 +70,11 @@ namespace Services
         public AmmoView CreateAmmo(WeaponType weaponType)
             => Instantiate(_staticDataService.GetWeaponData(weaponType).AmmoPrefab, _ammosParent);
 
-        public SlotUiView CreateEquipmentUiSlot(Transform parent)
-            => Instantiate(_uiConfig.EquipSlotUiPrefab, parent);
+        public ShipSlotUiView CreateEquipmentUiSlot(Transform parent)
+            => Instantiate(_uiConfig.ShipSlotUiPrefab, parent);
+
+        public SlotUiView CreateSelectEquipmentUiSlot(Transform parent) 
+            => Instantiate(_uiConfig.SlotUiPrefab, parent);
 
         public Sprite GetWeaponIcon(WeaponType weaponType)
             => _staticDataService.GetWeaponData(weaponType).Icon;

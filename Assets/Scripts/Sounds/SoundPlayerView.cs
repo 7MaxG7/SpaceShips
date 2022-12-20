@@ -3,7 +3,7 @@
 
 namespace Sounds
 {
-    internal sealed class SoundPlayerView : MonoBehaviour
+    public sealed class SoundPlayerView : MonoBehaviour
     {
         [SerializeField] private AudioSource _musicSource;
         [SerializeField] private AudioSource _sfxSource;

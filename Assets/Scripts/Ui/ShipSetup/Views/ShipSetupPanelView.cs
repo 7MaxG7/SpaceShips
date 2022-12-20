@@ -8,18 +8,9 @@ namespace Ui
         [SerializeField] private OpponentId _opponentId;
         [SerializeField] private Transform _weaponSlotsContent;
         [SerializeField] private Transform _moduleSlotsContent;
-        [SerializeField] private Transform[] _weaponSelectAnchors;
-        [SerializeField] private Transform[] _moduleSelectAnchors;
 
         public OpponentId OpponentId => _opponentId;
         public Transform WeaponSlotsContent => _weaponSlotsContent;
         public Transform ModuleSlotsContent => _moduleSlotsContent;
-
-        
-        public Transform GetWeaponSelectAnchor(int index) 
-            => _weaponSelectAnchors.Length > index ? _weaponSelectAnchors[index] : null;
-
-        public Transform GetModuleSelectAnchor(int index) 
-            => _moduleSelectAnchors.Length > index ? _moduleSelectAnchors[index] : null;
     }
 }

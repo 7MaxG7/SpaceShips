@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e149f121144cefaa0c691bc9776353, type: 3}
   m_Name: WeaponBData
   m_EditorClassIdentifier: 
-  _weapon: 2
+  _weaponType: 2
+  _isActive: 1
   _damage: 4
   _cooldown: 2
   _prefab: {fileID: 6855721273897839560, guid: 2a984e003b7f80f479b749e07c863ed9, type: 3}

@@ -45,8 +45,8 @@ namespace Infrastructure
 
         private void PrepareSetupScene()
         {
-            _shipsInitializer.PrepareShips();
             _assetsProvider.PrepareSetupShipRoots();
+            _shipsInitializer.PrepareShips();
             _shipSetupMenuController.PrepareUi(_shipsInitializer.Ships);
             _shipSetupMenuController.OnSetupComplete += SwitchState;
         }

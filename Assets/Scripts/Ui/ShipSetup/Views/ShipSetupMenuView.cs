@@ -21,12 +21,10 @@ namespace Ui
         public ShipSetupPanelView[] ShipPanels => _shipPanels;
         public WeaponSelectView WeaponSelectPanel => _weaponSelectPanel;
         public ModuleSelectView ModuleSelectPanel => _moduleSelectPanel;
-
+        
 
         public void Init()
         {
-            _weaponSelectPanel.Init();
-            _moduleSelectPanel.Init();
             _hideAllButton.onClick.AddListener(() => OnHideAllPanelsClick?.Invoke());
             _setupCompleteButton.onClick.AddListener(() => OnSetupComplete?.Invoke());
         }
@@ -35,14 +33,14 @@ namespace Ui
         {
             _weaponSelectPanel.Setup(opponentId, index);
             _weaponSelectPanel.Show();
-            _weaponSelectPanel.transform.SetParent(anchor, false);
+            _weaponSelectPanel.transform.position = anchor.position;
         }
 
         public void ShowModuleSelectPanel(OpponentId opponentId, int index, Transform anchor)
         {
             _moduleSelectPanel.Setup(opponentId, index);
             _moduleSelectPanel.Show();
-            _moduleSelectPanel.transform.SetParent(anchor, false);
+            _moduleSelectPanel.transform.position = anchor.position;
         }
 
         public void HideWeaponSelectPanel()

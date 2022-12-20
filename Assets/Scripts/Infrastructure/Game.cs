@@ -7,6 +7,7 @@ namespace Infrastructure
     internal sealed class Game : IGame
     {
         public IControllersHolder Controllers { get; private set; }
+        public ICoroutineRunner CoroutineRunner { get; private set; }
 
         private IGameStateMachine _gameStateMachine;
         private ISceneLoader _sceneLoader;
@@ -24,7 +25,8 @@ namespace Infrastructure
 
         public void Init(ICoroutineRunner coroutineRunner)
         {
-            _sceneLoader.Init(coroutineRunner);
+            CoroutineRunner = coroutineRunner;
+            _sceneLoader.Init(CoroutineRunner);
 
             _gameStateMachine.GetState(typeof(LeaveBattleState)).OnStateChange += EnterShipSetupState;
             _gameStateMachine.GetState(typeof(RunBattleState)).OnStateChange += EnterLeaveBattleState;

@@ -9,5 +9,7 @@ namespace Abstractions.Services
         ShipData GetShipData(ShipType shipType);
         WeaponData GetWeaponData(WeaponType weapon);
         ModuleData GetModuleData(ModuleType module);
+        WeaponData[] GetAllEnabledWeaponsData();
+        ModuleData[] GetAllEnabledModulesData();
     }
 }

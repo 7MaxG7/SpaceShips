@@ -4,7 +4,9 @@ using System.Linq;
 using Abstractions.Services;
 using Abstractions.Ships;
 using Abstractions.Ui;
+using Configs;
 using Enums;
+using Infrastructure;
 using UnityEngine;
 using Zenject;
 
@@ -15,15 +17,22 @@ namespace Ui.ShipSetup.Controllers
         public event Action OnSetupComplete;
 
         private readonly IAssetsProvider _assetsProvider;
+        private readonly IStaticDataService _staticDataService;
+        private readonly IGame _game;
+        private readonly UiConfig _uiConfig;
         private ShipSetupMenuView _shipSetupMenuView;
         private readonly Dictionary<OpponentId, ShipPanelController> _shipPanels = new();
         private Dictionary<OpponentId, IShip> _ships;
 
 
         [Inject]
-        public ShipSetupMenuController(IAssetsProvider assetsProvider)
+        public ShipSetupMenuController(IAssetsProvider assetsProvider, IStaticDataService staticDataService, IGame game
+            , UiConfig uiConfig)
         {
             _assetsProvider = assetsProvider;
+            _staticDataService = staticDataService;
+            _game = game;
+            _uiConfig = uiConfig;
         }
 
         public void PrepareUi(Dictionary<OpponentId, IShip> ships)
@@ -33,6 +42,10 @@ namespace Ui.ShipSetup.Controllers
                 _shipSetupMenuView = _assetsProvider.CreateShipSetupMenu();
             
             _shipSetupMenuView.Init();
+            _shipSetupMenuView.WeaponSelectPanel.Init(_assetsProvider, _game.CoroutineRunner, _uiConfig.FadeAnimDuration);
+            _shipSetupMenuView.ModuleSelectPanel.Init(_assetsProvider, _game.CoroutineRunner, _uiConfig.FadeAnimDuration);
+            _shipSetupMenuView.WeaponSelectPanel.SetupWeaponSelectPanel(_staticDataService.GetAllEnabledWeaponsData());
+            _shipSetupMenuView.ModuleSelectPanel.SetupModuledSelectPanel(_staticDataService.GetAllEnabledModulesData());
             _shipSetupMenuView.WeaponSelectPanel.OnEquipmentSelect += SelectShipWeapon;
             _shipSetupMenuView.ModuleSelectPanel.OnEquipmentSelect += SelectShipModule;
             foreach (var opponentId in ships.Keys)
@@ -53,7 +66,6 @@ namespace Ui.ShipSetup.Controllers
 
             _shipSetupMenuView.OnHideAllPanelsClick += _shipSetupMenuView.HideUnnecessaryPanels;
             _shipSetupMenuView.OnSetupComplete += InvokeSetupComplete;
-            _shipSetupMenuView.HideUnnecessaryPanels();
         }
 
         public void CleanUp()

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Abstractions.Services
 {
-    internal interface IAssetsProvider
+    public interface IAssetsProvider
     {
         CurtainView CreateCurtain();
         void PrepareSetupShipRoots();
@@ -18,7 +18,8 @@ namespace Abstractions.Services
         SoundPlayerView CreateSoundPlayer();
         ShipView CreateShip(ShipType shipType, Vector3 position, Quaternion rotation);
         AmmoView CreateAmmo(WeaponType weaponType);
-        SlotUiView CreateEquipmentUiSlot(Transform parent);
+        SlotUiView CreateSelectEquipmentUiSlot(Transform equipmentsContent);
+        ShipSlotUiView CreateEquipmentUiSlot(Transform parent);
         Sprite GetWeaponIcon(WeaponType weaponType);
         Sprite GetModuleIcon(ModuleType moduleType);
         WeaponView CreateWeapon(WeaponType weaponType, Transform parent);

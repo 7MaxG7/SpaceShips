@@ -29,7 +29,7 @@ namespace Ui
             }
 
             _canvasGroup.alpha = 0;
-            _canvasGroup.DOFade(1, _uiConfig.CurtainAnimDuration)
+            _canvasGroup.DOFade(1, _uiConfig.FadeAnimDuration)
                 .OnComplete(() => callback?.Invoke());
         }
 
@@ -43,7 +43,7 @@ namespace Ui
                 return;
             }
 
-            _canvasGroup.DOFade(0, _uiConfig.CurtainAnimDuration)
+            _canvasGroup.DOFade(0, _uiConfig.FadeAnimDuration)
                 .OnComplete(() =>
                 {
                     gameObject.SetActive(false);

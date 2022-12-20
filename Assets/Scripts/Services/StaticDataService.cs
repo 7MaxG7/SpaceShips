@@ -22,7 +22,7 @@ namespace Services
                 .ToDictionary(data => data.ShipType, data => data);
             _weaponDatas = Resources
                 .LoadAll<WeaponData>(Constants.WEAPON_DATA_PATH)
-                .ToDictionary(data => data.Weapon, data => data);
+                .ToDictionary(data => data.WeaponType, data => data);
             _moduleDatas = Resources
                 .LoadAll<ModuleData>(Constants.MODULE_DATA_PATH)
                 .ToDictionary(data => data.ModuleType, data => data);
@@ -42,5 +42,15 @@ namespace Services
             => _moduleDatas.TryGetValue(module, out var data)
                 ? data
                 : null;
+
+        public WeaponData[] GetAllEnabledWeaponsData()
+        {
+            return _weaponDatas.Values.Where(data => data.IsActive).ToArray();
+        }
+
+        public ModuleData[] GetAllEnabledModulesData()
+        {
+            return _moduleDatas.Values.Where(data => data.IsActive).ToArray();
+        }
     }
 }

@@ -17,8 +17,8 @@ namespace Ui.ShipSetup
 
         private readonly IAssetsProvider _assetsProvider;
         private readonly ShipSetupPanelView _shipPanelView;
-        private readonly List<SlotUiView> _weaponSlots = new();
-        private readonly List<SlotUiView> _moduleSlots = new();
+        private readonly List<ShipSlotUiView> _weaponSlots = new();
+        private readonly List<ShipSlotUiView> _moduleSlots = new();
         private bool _isCleaned;
 
         private OpponentId OpponentId => _shipPanelView.OpponentId;
@@ -63,11 +63,11 @@ namespace Ui.ShipSetup
             switch (type)
             {
                 case EquipmentType.Weapon:
-                    return _shipPanelView.GetWeaponSelectAnchor(index);
+                    return _weaponSlots.FirstOrDefault(slot => slot.Index == index)?.SelectPanelAnchor;
                 case EquipmentType.Module:
-                    return _shipPanelView.GetModuleSelectAnchor(index);
+                    return _moduleSlots.FirstOrDefault(slot => slot.Index == index)?.SelectPanelAnchor;
                 default:
-                    Debug.LogError($"{this}: No anchor for type {type.ToString()}");
+                    Debug.LogError($"{this}: No anchor for type {type.ToString()} index {index}");
                     return null;
             }
         }
@@ -80,8 +80,7 @@ namespace Ui.ShipSetup
             
             foreach (var slot in _weaponSlots)
             {
-                slot.OnSlotClick -= InvokeWeaponSelect;
-                slot.CleanUp();
+                slot.SelectButton.onClick.RemoveAllListeners();
                 if (slot != null && slot.gameObject != null)
                     Object.Destroy(slot.gameObject);
             }
@@ -89,8 +88,7 @@ namespace Ui.ShipSetup
             
             foreach (var slot in _moduleSlots)
             {
-                slot.OnSlotClick -= InvokeWeaponSelect;
-                slot.CleanUp();
+                slot.SelectButton.onClick.RemoveAllListeners();
                 if(slot != null && slot.gameObject != null)
                     Object.Destroy(slot.gameObject);
             }
@@ -100,8 +98,11 @@ namespace Ui.ShipSetup
         private void InitWeaponSlots(IWeaponBattery shipWeapons)
         {
             CheckSlotsAmount(shipWeapons.MaxEquipmentsAmount, _weaponSlots, _shipPanelView.WeaponSlotsContent, out var newSlots);
-            foreach (var slot in newSlots) 
-                slot.OnSlotClick += InvokeWeaponSelect;
+            foreach (var slot in newSlots)
+            {
+                var shipSlot = slot;
+                shipSlot.SelectButton.onClick.AddListener(() => InvokeWeaponSelect(shipSlot.Index));
+            }
             for (var i = 0; i < _weaponSlots.Count; i++)
             {
                 if (!TryInitSlot(shipWeapons.MaxEquipmentsAmount, _weaponSlots[i], i))
@@ -117,8 +118,11 @@ namespace Ui.ShipSetup
         private void InitModuleSlots(IShipModules shipModules)
         {
             CheckSlotsAmount(shipModules.MaxEquipmentsAmount, _moduleSlots, _shipPanelView.ModuleSlotsContent, out var newSlots);
-            foreach (var slot in newSlots) 
-                slot.OnSlotClick += InvokeModuleSelect;
+            foreach (var slot in newSlots)
+            {
+                var shipSlot = slot;
+                shipSlot.SelectButton.onClick.AddListener(() => InvokeModuleSelect(shipSlot.Index));
+            }
             for (var index = 0; index < _moduleSlots.Count; index++)
             {
                 if (!TryInitSlot(shipModules.MaxEquipmentsAmount, _moduleSlots[index], index))
@@ -131,22 +135,22 @@ namespace Ui.ShipSetup
             }
         }
 
-        private bool TryInitSlot(int maxAmount, SlotUiView slot, int index)
+        private bool TryInitSlot(int maxAmount, ShipSlotUiView slot, int index)
         {
             if (index >= maxAmount)
             {
-                slot.CleanUp();
+                slot.SelectButton.onClick.RemoveAllListeners();
                 slot.gameObject.SetActive(false);
                 return false;
             }
 
-            slot.Init(index);
+            slot.Init(OpponentId, index);
             return true;
         }
 
-        private void CheckSlotsAmount(int amount, List<SlotUiView> currentSlots, Transform content, out List<SlotUiView> newSlots)
+        private void CheckSlotsAmount(int amount, List<ShipSlotUiView> currentSlots, Transform content, out List<ShipSlotUiView> newSlots)
         {
-            newSlots = new List<SlotUiView>();
+            newSlots = new List<ShipSlotUiView>();
             currentSlots.ForEach(view => view.gameObject.SetActive(true));
             while (currentSlots.Count < amount)
             {
