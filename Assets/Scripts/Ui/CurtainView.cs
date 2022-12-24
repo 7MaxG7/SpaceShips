@@ -1,5 +1,4 @@
 ﻿using System;
-using Configs;
 using DG.Tweening;
 using UnityEngine;
 
@@ -8,12 +7,13 @@ namespace Ui
     public class CurtainView : MonoBehaviour
     {
         [SerializeField] private CanvasGroup _canvasGroup;
-        private UiConfig _uiConfig;
 
-        
-        public void Init(UiConfig uiConfig)
+        private float _animationDuration;
+
+
+        public void Init(float animationDuration)
         {
-            _uiConfig = uiConfig;
+            _animationDuration = animationDuration;
             DontDestroyOnLoad(this);
         }
 
@@ -29,7 +29,7 @@ namespace Ui
             }
 
             _canvasGroup.alpha = 0;
-            _canvasGroup.DOFade(1, _uiConfig.FadeAnimDuration)
+            _canvasGroup.DOFade(1, _animationDuration)
                 .OnComplete(() => callback?.Invoke());
         }
 
@@ -43,7 +43,17 @@ namespace Ui
                 return;
             }
 
-            _canvasGroup.DOFade(0, _uiConfig.FadeAnimDuration)
+            _canvasGroup.DOFade(0, _animationDuration)
+                .OnComplete(() =>
+                {
+                    gameObject.SetActive(false);
+                    callback?.Invoke();
+                });
+        }
+
+        public void HideCurtain(float startDelay, Action callback)
+        {
+            _canvasGroup.DOFade(0, _animationDuration).SetDelay(startDelay)
                 .OnComplete(() =>
                 {
                     gameObject.SetActive(false);

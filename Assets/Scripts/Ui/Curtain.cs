@@ -11,6 +11,7 @@ namespace Services
         private readonly UiConfig _uiConfig;
         private CurtainView _curtainView;
 
+        
         [Inject]
         public Curtain(UiConfig uiConfig)
         {
@@ -20,7 +21,7 @@ namespace Services
         public void Prepare(CurtainView curtainView)
         {
             _curtainView = curtainView;
-            _curtainView.Init(_uiConfig);
+            _curtainView.Init(_uiConfig.CurtainAnimDuration);
         }
 
         public void ShowCurtain(bool isAnimated = true, Action callback = null)
@@ -28,5 +29,8 @@ namespace Services
 
         public void HideCurtain(bool isAnimated = true, Action callback = null)
             => _curtainView.HideCurtain(isAnimated, callback);
+
+        public void HideCurtain(float startDelay, Action callback = null)
+            => _curtainView.HideCurtain(startDelay, callback);
     }
 }

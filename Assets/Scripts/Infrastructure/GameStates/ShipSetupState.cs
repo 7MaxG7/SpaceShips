@@ -11,6 +11,8 @@ namespace Infrastructure
     internal sealed class ShipSetupState : IShipSetupState
     {
         public event Action OnStateChange;
+        
+        private const float CURTAIN_HIDE_DELAY = 0.35f;
 
         private readonly IShipSetupMenuController _shipSetupMenuController;
         private readonly ICurtain _curtain;
@@ -33,8 +35,9 @@ namespace Infrastructure
         public void Enter()
         {
             PrepareSetupScene();
-            _curtain.HideCurtain();
             _soundPlayer.PlayMusic();
+            // Delay prevents lagging animation on load after bootstrap
+            _curtain.HideCurtain(CURTAIN_HIDE_DELAY);
         }
 
         public void Exit()
