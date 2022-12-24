@@ -38,11 +38,9 @@ namespace Ui.Battle
                 }
 
                 ship.Health.OnHpChanged += healthPanel.SetCurrentHp;
-                healthPanel.SetMaxHp(ship.Health.MaxHp);
-                healthPanel.SetCurrentHp(ship.Health.CurrentHp);
+                healthPanel.SetCurrentHp(ship.Health.CurrentHp, ship.Health.MaxHp);
                 ship.Health.OnShieldChanged += healthPanel.SetCurrentShield;
-                healthPanel.SetMaxShield(ship.Health.MaxShield);
-                healthPanel.SetCurrentShield(ship.Health.CurrentShield);
+                healthPanel.SetCurrentShield(ship.Health.CurrentShield, ship.Health.MaxShield);
             }
             _ui.LeaveButton.onClick.AddListener(() => OnBattleLeaved?.Invoke());
             _ui.HideBattleEndObjects();

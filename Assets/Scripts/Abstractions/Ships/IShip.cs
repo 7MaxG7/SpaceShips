@@ -16,7 +16,9 @@ namespace Abstractions.Ships
         string Name { get; }
 
         void SetView(ShipView shipView);
+        void PrepareToBattle();
         void TakeDamage(int damage);
         void Kill();
+        void CleanUpView();
     }
 }

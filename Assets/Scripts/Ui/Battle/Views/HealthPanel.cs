@@ -13,23 +13,19 @@ namespace Ui.Battle.Views
 
         public OpponentId OpponentId => _opponent;
 
-        public void SetCurrentHp(float currentHp) 
-            => _hpSlider.value = ModifyToSliderValue(currentHp);
+        public void SetCurrentHp(float currentHp, float maxHp) 
+            => _hpSlider.value = ModifyToSliderValue(currentHp, maxHp);
 
-        public void SetMaxHp(float maxHp)
-            => _hpSlider.maxValue = ModifyToSliderValue(maxHp);
+        public void SetCurrentShield(float currentShield, float maxShield)
+            => _shieldSlider.value = ModifyToSliderValue(currentShield, maxShield);
 
-        public void SetCurrentShield(float currentShield)
-            => _shieldSlider.value = ModifyToSliderValue(currentShield);
-
-        public void SetMaxShield(float maxHp)
-            => _shieldSlider.maxValue = ModifyToSliderValue(maxHp);
-
-        private int ModifyToSliderValue(float value)
+        private float ModifyToSliderValue(float value, float maxValue)
         {
+            if (maxValue <= 0)
+                return 0;
             if (value < 0)
                 value = 0;
-            return (int)Math.Ceiling(value);
+            return value / maxValue;
         }
     }
 }

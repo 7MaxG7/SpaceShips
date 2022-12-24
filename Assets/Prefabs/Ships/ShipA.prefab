@@ -81,6 +81,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03b669b5f62c4531ab3dec5e007dc21c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _shield: {fileID: 7486529414589759184}
   _weaponSlots:
   - {fileID: 2482109991909056164}
   - {fileID: 698630160703765761}
@@ -242,6 +243,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7128769421120338185}
+  - component: {fileID: 7486529414589759184}
   m_Layer: 0
   m_Name: Shield
   m_TagString: Untagged
@@ -265,6 +267,18 @@ Transform:
   m_Father: {fileID: 3708336194328819250}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7486529414589759184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4505985445355111830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67592df18eac4abe802f869f3124e5a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5096846951098127352
 GameObject:
   m_ObjectHideFlags: 0

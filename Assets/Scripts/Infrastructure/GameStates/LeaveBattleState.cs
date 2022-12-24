@@ -40,6 +40,7 @@ namespace Infrastructure
                 _controllers.RemoveController(ship.Health);
                 _controllers.RemoveController(ship.WeaponBattery);
                 ship.WeaponBattery.OnShoot -= _soundPlayer.PlayShoot;
+                ship.CleanUpView();
             }
             _shipsInteractor.CleanUp();
             _battleUi.CleanUp();

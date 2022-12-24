@@ -40,7 +40,7 @@ namespace Ui.ShipSetup.Controllers
             _ships = ships;
             if (_shipSetupMenuView == null)
                 _shipSetupMenuView = _assetsProvider.CreateShipSetupMenu();
-            
+
             _shipSetupMenuView.Init();
             _shipSetupMenuView.WeaponSelectPanel.Init(_assetsProvider, _game.CoroutineRunner, _uiConfig.FadeAnimDuration);
             _shipSetupMenuView.ModuleSelectPanel.Init(_assetsProvider, _game.CoroutineRunner, _uiConfig.FadeAnimDuration);
@@ -76,15 +76,21 @@ namespace Ui.ShipSetup.Controllers
                 panel.OnModuleSelectClick -= ShowSelectModulePanel;
                 panel.CleanUp();
             }
+
             _shipPanels.Clear();
-            
+
+            foreach (var ship in _ships.Values)
+            {
+                ship.CleanUpView();
+            }
+
             _shipSetupMenuView.WeaponSelectPanel.OnEquipmentSelect -= SelectShipWeapon;
             _shipSetupMenuView.ModuleSelectPanel.OnEquipmentSelect -= SelectShipModule;
             _shipSetupMenuView.OnHideAllPanelsClick -= _shipSetupMenuView.HideUnnecessaryPanels;
             _shipSetupMenuView.OnSetupComplete -= InvokeSetupComplete;
         }
 
-        private void InvokeSetupComplete() 
+        private void InvokeSetupComplete()
             => OnSetupComplete?.Invoke();
 
         private void ShowSelectWeaponPanel(OpponentId opponentId, int index)

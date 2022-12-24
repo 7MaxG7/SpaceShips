@@ -41,6 +41,17 @@ namespace Ships
             ShipModules.SetSlots(_shipView.ModuleSlots);
         }
 
+        public void PrepareToBattle()
+        {
+            Health.OnShieldChanged += _shipView.Shield.UpdatePower;
+            _shipView.Shield.UpdatePower(Health.CurrentShield, Health.MaxShield);
+        }
+
+        public void CleanUpView()
+        {
+            Health.OnShieldChanged -= _shipView.Shield.UpdatePower;
+        }
+
         public void TakeDamage(int damage)
         {
             Health.TakeDamage(damage);
@@ -66,6 +77,7 @@ namespace Ships
         {
             ShipModules.OnModuleEquiped -= UpgradeShip;
             ShipModules.OnModuleUnequip -= DowngradeShip;
+            CleanUpView();
         }
 
         private void UpgradeShip(IModule module)

@@ -89,6 +89,8 @@ namespace Infrastructure
                         _moduleFactory.GenerateView(module, modules.GetSlotTransform(i));
                 }
 
+                opponent.Value.PrepareToBattle();
+
                 _shipsInteractor.AddShip(opponent.Value, view);
             }
         }

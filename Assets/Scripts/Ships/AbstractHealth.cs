@@ -5,8 +5,8 @@ namespace Ships.Data
 {
     internal abstract class AbstractHealth : IHealth
     {
-        public event Action<float> OnHpChanged;
-        public event Action<float> OnShieldChanged;
+        public event Action<float, float> OnHpChanged;
+        public event Action<float, float> OnShieldChanged;
 
         public float ShieldRecovery { get; protected set; }
         public float MaxHp { get; protected set; }
@@ -19,7 +19,7 @@ namespace Ships.Data
             {
                 _currentHp = value;
                 _currentHp = Math.Clamp(value, 0, MaxHp);
-                OnHpChanged?.Invoke(_currentHp);
+                OnHpChanged?.Invoke(_currentHp, MaxHp);
             }
         }
 
@@ -29,7 +29,7 @@ namespace Ships.Data
             private set
             {
                 _currentShield = Math.Clamp(value, 0, MaxShield);
-                OnShieldChanged?.Invoke(_currentShield);
+                OnShieldChanged?.Invoke(_currentShield, MaxShield);
             }
         }
 

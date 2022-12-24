@@ -5,8 +5,8 @@ namespace Abstractions.Ships
 {
     public interface IHealth : IUpdater
     {
-        event Action<float> OnHpChanged;
-        event Action<float> OnShieldChanged;
+        event Action<float, float> OnHpChanged;
+        event Action<float, float> OnShieldChanged;
         
         float ShieldRecovery { get; }
         float MaxHp { get; }
