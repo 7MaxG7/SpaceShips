@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Ui.ShipSetup
 {
-    public abstract class AbstractEquipmentSelectView<T> : MonoBehaviour, ICleaner where T : Enum
+    public abstract class AbstractEquipmentSelectView<T> : MonoBehaviour, ICleanable where T : Enum
     {
         [SerializeField] private RectTransform _rectTransform;
         [SerializeField] private RectTransform _equipmentsContent;

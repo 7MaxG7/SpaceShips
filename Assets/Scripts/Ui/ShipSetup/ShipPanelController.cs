@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace Ui.ShipSetup
 {
-    internal class ShipPanelController : ICleaner
+    internal class ShipPanelController : ICleanable
     {
         public event Action<OpponentId, int> OnWeaponSelectClick;
         public event Action<OpponentId, int> OnModuleSelectClick;

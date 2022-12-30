@@ -5,11 +5,11 @@ namespace Infrastructure
 {
     public class GameBootstrapper : MonoBehaviour, ICoroutineRunner
     {
-        private IGame _game;
+        private Game _game;
 
 
         [Inject]
-        private void InjectDependencies(IGame game)
+        private void InjectDependencies(Game game)
         {
             _game = game;
         }
@@ -21,9 +21,9 @@ namespace Infrastructure
         }
 
         private void Update() 
-            => _game.Controllers?.OnUpdate(Time.deltaTime);
+            => _game.Updater?.OnUpdate(Time.deltaTime);
 
         private void OnDestroy() 
-            => _game.Controllers.CleanUp();
+            => _game.Cleaner.CleanUp();
     }
 }

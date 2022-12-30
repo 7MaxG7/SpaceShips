@@ -3,7 +3,7 @@ using Infrastructure;
 
 namespace Abstractions.Ships
 {
-    public interface IHealth : IUpdater
+    public interface IHealth : IUpdatable
     {
         event Action<float, float> OnHpChanged;
         event Action<float, float> OnShieldChanged;

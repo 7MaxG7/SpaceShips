@@ -5,7 +5,7 @@ using Ships;
 
 namespace Abstractions.Ships
 {
-    public interface IShip : ICleaner
+    public interface IShip : ICleanable
     {
         event Action<IShip> OnDied;
         

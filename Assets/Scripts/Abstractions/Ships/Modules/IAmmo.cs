@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Abstractions.Ships
 {
-    public interface IAmmo : ICleaner
+    public interface IAmmo : ICleanable
     {
         event Action<IAmmo, IWeapon, IDamagableView> OnReachedDamagable;
         

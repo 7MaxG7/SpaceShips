@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Abstractions.Ships
 {
-    public interface IWeaponBattery : IAbstractEquipments<IWeapon, WeaponType>, IUpdater
+    public interface IWeaponBattery : IAbstractEquipments<IWeapon, WeaponType>, IUpdatable
     {
         event Action<WeaponType> OnShoot;
         float ReloadRate { get; }

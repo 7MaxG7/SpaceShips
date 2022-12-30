@@ -7,11 +7,11 @@ namespace Infrastructure.Zenject
     {
         public override void InstallBindings()
         {
-            Container.Bind<IGameBootstrapState>().To<GameBootstrapState>().AsSingle();
-            Container.Bind<IShipSetupState>().To<ShipSetupState>().AsSingle();
-            Container.Bind<ILoadBattleState>().To<LoadBattleState>().AsSingle();
-            Container.Bind<IRunBattleState>().To<RunBattleState>().AsSingle();
-            Container.Bind<ILeaveBattleState>().To<LeaveBattleState>().AsSingle();
+            Container.Bind<GameBootstrapState>().AsSingle();
+            Container.Bind<ShipSetupState>().AsSingle();
+            Container.Bind<LoadBattleState>().AsSingle();
+            Container.Bind<RunBattleState>().AsSingle();
+            Container.Bind<LeaveBattleState>().AsSingle();
 
             Container.Bind<IGameStateMachine>().To<GameStateMachine>().AsSingle();
         }

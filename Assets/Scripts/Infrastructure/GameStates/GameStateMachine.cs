@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Zenject;
 
 
@@ -7,13 +8,17 @@ namespace Infrastructure
 {
     internal sealed class GameStateMachine : IGameStateMachine
     {
+        public ICoroutineRunner CoroutineRunner { get; private set; }
+
         private readonly Dictionary<Type, IGameState> _states;
         private IGameState _currentState;
 
 
         [Inject]
-        public GameStateMachine(IGameBootstrapState gameBootstrapState, IShipSetupState shipSetupState
-            , ILoadBattleState loadBattleState, IRunBattleState runBattleState, ILeaveBattleState leaveBattleState)
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor")]
+        public GameStateMachine(GameBootstrapState gameBootstrapState, ShipSetupState shipSetupState
+            , LoadBattleState loadBattleState, RunBattleState runBattleState, LeaveBattleState leaveBattleState
+            , ICleaner cleaner)
         {
             _states = new Dictionary<Type, IGameState>
             {
@@ -23,11 +28,7 @@ namespace Infrastructure
                 [typeof(RunBattleState)] = runBattleState,
                 [typeof(LeaveBattleState)] = leaveBattleState
             };
-        }
-
-        public IGameState GetState(Type stateType)
-        {
-            return _states.TryGetValue(stateType, out var state) ? state : null;
+            cleaner.AddCleanable(this);
         }
 
         public void Enter<TState>() where TState : class, IGameState
@@ -40,6 +41,16 @@ namespace Infrastructure
         {
             _currentState = null;
             _states.Clear();
+        }
+
+        public void Init(ICoroutineRunner coroutineRunner)
+        {
+            CoroutineRunner = coroutineRunner;
+            _states[typeof(GameBootstrapState)].Init(this);
+            _states[typeof(ShipSetupState)].Init(this);
+            _states[typeof(LoadBattleState)].Init(this);
+            _states[typeof(RunBattleState)].Init(this);
+            _states[typeof(LeaveBattleState)].Init(this);
         }
 
         private TState SwitchCurrentState<TState>() where TState : class, IGameState

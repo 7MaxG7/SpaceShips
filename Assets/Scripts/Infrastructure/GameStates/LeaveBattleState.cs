@@ -1,6 +1,4 @@
-﻿using System;
-using Abstractions.Services;
-using Abstractions.Ui;
+﻿using Abstractions.Services;
 using Services;
 using Sounds;
 using Utils;
@@ -9,26 +7,23 @@ using Zenject;
 
 namespace Infrastructure
 {
-    internal sealed class LeaveBattleState : ILeaveBattleState
+    internal sealed class LeaveBattleState : IGameState
     {
-        public event Action OnStateChange;
-
         private readonly IShipsInteractor _shipsInteractor;
-        private readonly IControllersHolder _controllers;
+        private readonly IUpdater _controllers;
         private readonly ISceneLoader _sceneLoader;
-        private readonly IBattleUi _battleUi;
         private readonly IAmmoPool _ammoPool;
         private readonly ISoundPlayer _soundPlayer;
+        private IGameStateMachine _stateMachine;
 
 
         [Inject]
-        public LeaveBattleState(IShipsInteractor shipsInteractor, IControllersHolder controllers,
-            ISceneLoader sceneLoader, IBattleUi battleUi, IAmmoPool ammoPool, ISoundPlayer soundPlayer)
+        public LeaveBattleState(IShipsInteractor shipsInteractor, IUpdater controllers,
+            ISceneLoader sceneLoader, IAmmoPool ammoPool, ISoundPlayer soundPlayer)
         {
             _shipsInteractor = shipsInteractor;
             _controllers = controllers;
             _sceneLoader = sceneLoader;
-            _battleUi = battleUi;
             _ammoPool = ammoPool;
             _soundPlayer = soundPlayer;
         }
@@ -43,14 +38,18 @@ namespace Infrastructure
                 ship.CleanUpView();
             }
             _shipsInteractor.CleanUp();
-            _battleUi.CleanUp();
             _ammoPool.CleanUp();
 
-            _sceneLoader.LoadScene(Constants.SETUP_SCENE_NAME, () => OnStateChange?.Invoke());
+            _sceneLoader.LoadScene(Constants.SETUP_SCENE_NAME, _stateMachine.Enter<ShipSetupState>);
         }
 
         public void Exit()
         {
+        }
+
+        public void Init(IGameStateMachine stateMachine)
+        {
+            _stateMachine = stateMachine;
         }
     }
 }

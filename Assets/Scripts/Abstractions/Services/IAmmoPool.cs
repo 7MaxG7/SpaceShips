@@ -4,7 +4,7 @@ using Infrastructure;
 
 namespace Abstractions.Services
 {
-    internal interface IAmmoPool : ICleaner
+    internal interface IAmmoPool : ICleanable
     {
         void Init();
         IAmmo SpawnAmmo(WeaponType weaponWeaponType);

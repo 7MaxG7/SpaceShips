@@ -19,11 +19,11 @@ namespace Services
 
 
         [Inject]
-        public AmmoPool(IAmmoFactory ammoFactory, IShipsInteractor shipsInteractor, IControllersHolder controllers)
+        public AmmoPool(IAmmoFactory ammoFactory, IShipsInteractor shipsInteractor, ICleaner cleaner)
         {
             _ammoFactory = ammoFactory;
             _shipsInteractor = shipsInteractor;
-            controllers.AddController(this);
+            cleaner.AddCleanable(this);
         }
 
         public void Init()

@@ -1,7 +1,8 @@
 ﻿namespace Infrastructure
 {
-    public interface IUpdater : IController
+    internal interface IUpdater : IUpdatable, ICleanable
     {
-        public void OnUpdate(float deltaTime);
+        void AddUpdatable(IUpdatable updatable);
+        void RemoveController(IUpdatable updatable);
     }
 }

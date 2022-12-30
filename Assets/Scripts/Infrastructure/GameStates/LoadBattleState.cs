@@ -1,7 +1,5 @@
-﻿using System;
-using Abstractions;
+﻿using Abstractions;
 using Abstractions.Services;
-using Abstractions.Ui;
 using Services;
 using Sounds;
 using Utils;
@@ -10,27 +8,24 @@ using Zenject;
 
 namespace Infrastructure
 {
-    internal sealed class LoadBattleState : ILoadBattleState
+    internal sealed class LoadBattleState : IGameState
     {
-        public event Action OnStateChange;
-
         private readonly ISceneLoader _sceneLoader;
         private readonly IShipsInteractor _shipsInteractor;
         private readonly ILocationFinder _locationFinder;
         private readonly IShipsFactory _shipsFactory;
         private readonly IWeaponFactory _weaponFactory;
         private readonly IAmmoPool _ammoPool;
-        private readonly IBattleUi _battleUi;
         private readonly IAssetsProvider _assetsProvider;
         private readonly IModuleFactory _moduleFactory;
         private readonly IShipsInitializer _shipsInitializer;
         private readonly ISoundPlayer _soundPlayer;
+        private IGameStateMachine _stateMachine;
 
 
         [Inject]
         public LoadBattleState(ISceneLoader sceneLoader, IShipsInteractor shipsInteractor, ILocationFinder locationFinder
-            , IShipsFactory shipsFactory, IWeaponFactory weaponFactory, IAmmoPool ammoPool, IBattleUi battleUi
-            , IAssetsProvider assetsProvider, IModuleFactory moduleFactory, IShipsInitializer shipsInitializer
+            , IShipsFactory shipsFactory, IWeaponFactory weaponFactory, IAmmoPool ammoPool, IAssetsProvider assetsProvider, IModuleFactory moduleFactory, IShipsInitializer shipsInitializer
             , ISoundPlayer soundPlayer)
         {
             _sceneLoader = sceneLoader;
@@ -39,7 +34,6 @@ namespace Infrastructure
             _shipsFactory = shipsFactory;
             _weaponFactory = weaponFactory;
             _ammoPool = ammoPool;
-            _battleUi = battleUi;
             _assetsProvider = assetsProvider;
             _moduleFactory = moduleFactory;
             _shipsInitializer = shipsInitializer;
@@ -53,13 +47,17 @@ namespace Infrastructure
         {
         }
 
+        public void Init(IGameStateMachine stateMachine)
+        {
+            _stateMachine = stateMachine;
+        }
+
         private void PrepareScene()
         {
             _assetsProvider.PrepareBattleRoots();
-            _battleUi.PrepareUi(_shipsInitializer.Ships);
             PrepareOpponents();
             
-            OnStateChange?.Invoke();
+            _stateMachine.Enter<RunBattleState>();
         }
 
         private void PrepareOpponents()

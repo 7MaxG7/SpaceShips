@@ -3,35 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using Abstractions.Services;
 using Abstractions.Ships;
-using Abstractions.Ui;
 using Configs;
 using Enums;
 using Infrastructure;
 using UnityEngine;
-using Zenject;
 
 namespace Ui.ShipSetup.Controllers
 {
-    internal class ShipSetupMenuController : IShipSetupMenuController
+    internal class ShipSetupMenuController : ICleanable
     {
         public event Action OnSetupComplete;
 
         private readonly IAssetsProvider _assetsProvider;
         private readonly IStaticDataService _staticDataService;
-        private readonly IGame _game;
         private readonly UiConfig _uiConfig;
-        private ShipSetupMenuView _shipSetupMenuView;
         private readonly Dictionary<OpponentId, ShipPanelController> _shipPanels = new();
+        private readonly ICoroutineRunner _coroutineRunner;
+        private ShipSetupMenuView _shipSetupMenuView;
         private Dictionary<OpponentId, IShip> _ships;
 
 
-        [Inject]
-        public ShipSetupMenuController(IAssetsProvider assetsProvider, IStaticDataService staticDataService, IGame game
-            , UiConfig uiConfig)
+        public ShipSetupMenuController(IAssetsProvider assetsProvider, IStaticDataService staticDataService, UiConfig uiConfig
+            , ICoroutineRunner coroutineRunner)
         {
+            _coroutineRunner = coroutineRunner;
             _assetsProvider = assetsProvider;
             _staticDataService = staticDataService;
-            _game = game;
             _uiConfig = uiConfig;
         }
 
@@ -42,8 +39,8 @@ namespace Ui.ShipSetup.Controllers
                 _shipSetupMenuView = _assetsProvider.CreateShipSetupMenu();
 
             _shipSetupMenuView.Init();
-            _shipSetupMenuView.WeaponSelectPanel.Init(_assetsProvider, _game.CoroutineRunner, _uiConfig.FadeAnimDuration);
-            _shipSetupMenuView.ModuleSelectPanel.Init(_assetsProvider, _game.CoroutineRunner, _uiConfig.FadeAnimDuration);
+            _shipSetupMenuView.WeaponSelectPanel.Init(_assetsProvider, _coroutineRunner, _uiConfig.FadeAnimDuration);
+            _shipSetupMenuView.ModuleSelectPanel.Init(_assetsProvider, _coroutineRunner, _uiConfig.FadeAnimDuration);
             _shipSetupMenuView.WeaponSelectPanel.SetupWeaponSelectPanel(_staticDataService.GetAllEnabledWeaponsData());
             _shipSetupMenuView.ModuleSelectPanel.SetupModuledSelectPanel(_staticDataService.GetAllEnabledModulesData());
             _shipSetupMenuView.WeaponSelectPanel.OnEquipmentSelect += SelectShipWeapon;

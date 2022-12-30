@@ -1,5 +1,4 @@
-﻿using System;
-using Abstractions.Services;
+﻿using Abstractions.Services;
 using DG.Tweening;
 using Services;
 using Sounds;
@@ -9,15 +8,14 @@ using Zenject;
 
 namespace Infrastructure
 {
-    internal sealed class GameBootstrapState : IGameBootstrapState
+    internal sealed class GameBootstrapState : IGameState
     {
-        public event Action OnStateChange;
-
         private readonly IStaticDataService _staticDataService;
         private readonly ISceneLoader _sceneLoader;
         private readonly ICurtain _curtain;
         private readonly IAssetsProvider _assetsProvider;
         private readonly ISoundPlayer _soundPlayer;
+        private IGameStateMachine _stateMachine;
 
 
         [Inject]
@@ -34,11 +32,16 @@ namespace Infrastructure
         public void Enter()
         {
             PrepareServices();
-            _sceneLoader.LoadScene(Constants.SETUP_SCENE_NAME, () => OnStateChange?.Invoke());
+            _sceneLoader.LoadScene(Constants.SETUP_SCENE_NAME, _stateMachine.Enter<ShipSetupState>);
         }
 
         public void Exit()
         {
+        }
+
+        public void Init(IGameStateMachine stateMachine)
+        {
+            _stateMachine = stateMachine;
         }
 
         private void PrepareServices()

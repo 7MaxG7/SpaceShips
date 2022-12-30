@@ -12,9 +12,10 @@ namespace Utils.Zenject
     {
         public override void InstallBindings()
         {
+            Container.Bind<Game>().AsSingle();
             Container.Bind<ICurtain>().To<Curtain>().AsSingle();
-            Container.Bind<IGame>().To<Game>().AsSingle();
-            Container.Bind<IControllersHolder>().To<ControllersHolder>().AsSingle();
+            Container.Bind<IUpdater>().To<Updater>().AsSingle();
+            Container.Bind<ICleaner>().To<Cleaner>().AsSingle();
             Container.Bind<IShipsInitializer>().To<ShipsInitializer>().AsSingle();
             Container.Bind<IStaticDataService>().To<StaticDataService>().AsSingle();
             Container.Bind<IAssetsProvider>().To<AssetsProvider>().AsSingle();

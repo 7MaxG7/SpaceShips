@@ -5,7 +5,7 @@ using Infrastructure;
 
 namespace Abstractions
 {
-    internal interface IShipsInitializer : ICleaner
+    internal interface IShipsInitializer : ICleanable
     {
         Dictionary<OpponentId, IShip> Ships { get; }
         

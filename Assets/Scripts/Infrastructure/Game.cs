@@ -4,66 +4,31 @@ using Zenject;
 
 namespace Infrastructure
 {
-    internal sealed class Game : IGame
+    internal sealed class Game
     {
-        public IControllersHolder Controllers { get; private set; }
-        public ICoroutineRunner CoroutineRunner { get; private set; }
+        public IUpdater Updater { get; }
+        public ICleaner Cleaner { get; }
 
-        private IGameStateMachine _gameStateMachine;
-        private ISceneLoader _sceneLoader;
-
-
+        private readonly IGameStateMachine _gameStateMachine;
+        private readonly ISceneLoader _sceneLoader;
+        
+        
         [Inject]
-        private void InjectDependencies(IControllersHolder controllers, IGameStateMachine gameStateMachine
+        public Game(IUpdater updater, ICleaner cleaner, IGameStateMachine gameStateMachine
             , ISceneLoader sceneLoader)
         {
-            Controllers = controllers;
+            Updater = updater;
+            Cleaner = cleaner;
             _gameStateMachine = gameStateMachine;
             _sceneLoader = sceneLoader;
-            Controllers.AddController(this);
+            Cleaner.AddCleanable(Updater);
         }
 
         public void Init(ICoroutineRunner coroutineRunner)
         {
-            CoroutineRunner = coroutineRunner;
-            _sceneLoader.Init(CoroutineRunner);
-
-            _gameStateMachine.GetState(typeof(LeaveBattleState)).OnStateChange += EnterShipSetupState;
-            _gameStateMachine.GetState(typeof(RunBattleState)).OnStateChange += EnterLeaveBattleState;
-            _gameStateMachine.GetState(typeof(LoadBattleState)).OnStateChange += EnterRunBattleState;
-            _gameStateMachine.GetState(typeof(ShipSetupState)).OnStateChange += EnterLoadBattleState;
-            _gameStateMachine.GetState(typeof(GameBootstrapState)).OnStateChange += EnterShipSetupState;
+            _sceneLoader.Init(coroutineRunner);
+            _gameStateMachine.Init(coroutineRunner);
             _gameStateMachine.Enter<GameBootstrapState>();
-        }
-
-        public void CleanUp()
-        {
-            _gameStateMachine.GetState(typeof(GameBootstrapState)).OnStateChange -= EnterShipSetupState;
-            _gameStateMachine.GetState(typeof(ShipSetupState)).OnStateChange -= EnterLoadBattleState;
-            _gameStateMachine.GetState(typeof(LoadBattleState)).OnStateChange -= EnterRunBattleState;
-            _gameStateMachine.GetState(typeof(RunBattleState)).OnStateChange -= EnterLeaveBattleState;
-            _gameStateMachine.GetState(typeof(LeaveBattleState)).OnStateChange -= EnterShipSetupState;
-            _gameStateMachine.CleanUp();
-        }
-
-        private void EnterShipSetupState()
-        {
-            _gameStateMachine.Enter<ShipSetupState>();
-        }
-
-        private void EnterLoadBattleState()
-        {
-            _gameStateMachine.Enter<LoadBattleState>();
-        }
-
-        private void EnterRunBattleState()
-        {
-            _gameStateMachine.Enter<RunBattleState>();
-        }
-
-        private void EnterLeaveBattleState()
-        {
-            _gameStateMachine.Enter<LeaveBattleState>();
         }
     }
 }

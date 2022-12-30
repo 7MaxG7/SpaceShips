@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Ui
 {
-    public class ShipSetupMenuView : MonoBehaviour, ICleaner
+    public class ShipSetupMenuView : MonoBehaviour, ICleanable
     {
         [SerializeField] private ShipSetupPanelView[] _shipPanels;
         [SerializeField] private WeaponSelectView _weaponSelectPanel;

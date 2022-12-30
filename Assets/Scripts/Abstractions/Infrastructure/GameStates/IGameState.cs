@@ -1,12 +1,8 @@
-﻿using System;
-
-
-namespace Infrastructure
+﻿namespace Infrastructure
 {
     internal interface IGameState
     {
-        public event Action OnStateChange;
-
+        void Init(IGameStateMachine gameStateMachine);
         public void Enter();
         public void Exit();
     }

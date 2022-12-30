@@ -1,7 +1,8 @@
 ﻿namespace Infrastructure
 {
-    public interface ICleaner : IController
+    internal interface ICleaner : ICleanable
     {
-        void CleanUp();
+        void AddCleanable(ICleanable cleanable);
+        void RemoveCleanable(ICleanable cleanable);
     }
 }

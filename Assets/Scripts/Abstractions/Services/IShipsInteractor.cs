@@ -5,7 +5,7 @@ using Infrastructure;
 
 namespace Abstractions.Services
 {
-    internal interface IShipsInteractor : ICleaner
+    internal interface IShipsInteractor : ICleanable
     {
         event Action<IShip> OnWinnerDefined;
         event Action<IAmmo> OnAmmoHit;

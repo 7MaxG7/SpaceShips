@@ -25,14 +25,15 @@ namespace Ships
         [Inject]
         public ShipsInitializer(IStaticDataService staticDataService, IShipsFactory shipsFactory
             , ILocationFinder locationFinder, IWeaponFactory weaponFactory, IModuleFactory moduleFactory
-            , IControllersHolder controllers, RulesConfig rulesConfig){
+            , ICleaner cleaner, RulesConfig rulesConfig)
+        {
             _staticDataService = staticDataService;
             _shipsFactory = shipsFactory;
             _locationFinder = locationFinder;
             _weaponFactory = weaponFactory;
             _moduleFactory = moduleFactory;
             _rulesConfig = rulesConfig;
-            controllers.AddController(this);
+            cleaner.AddCleanable(this);
         }
         
         public void PrepareShips()

@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using Abstractions.Services;
 using Abstractions.Ships;
-using Abstractions.Ui;
 using Enums;
+using Infrastructure;
 using UnityEngine;
-using Zenject;
 
 namespace Ui.Battle
 {
-    internal class BattleUi : IBattleUi
+    internal class BattleUi : ICleanable
     {
         public event Action OnBattleLeaved;
         
@@ -18,7 +17,6 @@ namespace Ui.Battle
         private BattleUiView _ui;
 
 
-        [Inject]
         public BattleUi(IAssetsProvider assetsProvider)
         {
             _assetsProvider = assetsProvider;
