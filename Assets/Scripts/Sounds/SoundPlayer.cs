@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Abstractions.Services;
 using Configs;
 using Enums;
@@ -11,8 +12,9 @@ namespace Sounds
 {
     internal sealed class SoundPlayer : ISoundPlayer
     {
+        private readonly IServicesFactory _servicesFactory;
         private readonly SoundConfig _soundConfig;
-        private readonly IAssetsProvider _assetsProvider;
+        
         private SoundPlayerView _soundPlayer;
         private Dictionary<WeaponType, AudioClip> _weaponShootClips;
         private AudioClip _musicClip;
@@ -20,15 +22,15 @@ namespace Sounds
 
 
         [Inject]
-        public SoundPlayer(SoundConfig soundConfig, IAssetsProvider assetsProvider)
+        public SoundPlayer(SoundConfig soundConfig, IServicesFactory servicesFactory)
         {
             _soundConfig = soundConfig;
-            _assetsProvider = assetsProvider;
+            _servicesFactory = servicesFactory;
         }
 
-        public void Init()
+        public async Task InitAsync()
         {
-            InitPlayer();
+            await InitPlayerAsync();
             InitClips();
         }
 
@@ -52,14 +54,14 @@ namespace Sounds
 
         public void PlayShoot(WeaponType weaponType)
         {
-            if (_weaponShootClips.ContainsKey(weaponType))
-                _soundPlayer.PlaySound(_weaponShootClips[weaponType]);
+            if (_weaponShootClips.TryGetValue(weaponType, out var clip))
+                _soundPlayer.PlaySound(clip);
         }
 
-        private void InitPlayer()
+        private async Task InitPlayerAsync()
         {
             if (_soundPlayer == null)
-                _soundPlayer = _assetsProvider.CreateSoundPlayer();
+                _soundPlayer = await _servicesFactory.CreateSoundPlayerAsync();
             _soundPlayer.MusicLoop = true;
             Object.DontDestroyOnLoad(_soundPlayer);
         }

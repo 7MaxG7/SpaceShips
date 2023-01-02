@@ -2,7 +2,7 @@
 
 namespace Ships.Views
 {
-    public class ModuleView : MonoBehaviour
+    public sealed class ModuleView : MonoBehaviour
     {
     }
 }

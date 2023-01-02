@@ -4,7 +4,7 @@ using Enums;
 
 namespace Services
 {
-    internal interface IModuleFactory : IEquipmentFactory<IModule, ModuleType>
+    public interface IModuleFactory : IEquipmentFactory<IModule, ModuleType>
     {
     }
 }

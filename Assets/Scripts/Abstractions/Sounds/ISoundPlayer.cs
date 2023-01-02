@@ -1,10 +1,11 @@
-﻿using Enums;
+﻿using System.Threading.Tasks;
+using Enums;
 
 namespace Sounds
 {
-    internal interface ISoundPlayer
+    public interface ISoundPlayer
     {
-        void Init();
+        Task InitAsync();
         void PlayMusic();
         void PlayShoot(WeaponType weaponType);
         void StopAll();

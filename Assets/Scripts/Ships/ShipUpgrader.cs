@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Services
 {
-    internal class ShipUpgrader : IShipUpgrader
+    public sealed class ShipUpgrader : IShipUpgrader
     {
         public void Upgrade(Ship ship, IModule module)
         {

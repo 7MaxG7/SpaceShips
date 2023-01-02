@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Abstractions.Services;
 using Abstractions.Ships;
 using UnityEngine;
@@ -7,20 +8,19 @@ using UnityEngine;
 namespace Ships
 {
 
-    internal abstract class AbstractEquipments<TEquipment, TEquipType> : IAbstractEquipments<TEquipment, TEquipType>
+    public abstract class AbstractEquipments<TEquipment, TEquipType> : IAbstractEquipments<TEquipment, TEquipType>
         where TEquipment : IEquipment where TEquipType : Enum
     {
         public int MaxEquipmentsAmount { get; }
-
         public IEquipmentFactory<TEquipment, TEquipType> EquipmentsFactory { get; }
         public Dictionary<int, TEquipment> Equipments { get; } = new();
         public Dictionary<int, Transform> Slots { get; } = new();
 
 
-        protected AbstractEquipments(int amount, IEquipmentFactory<TEquipment, TEquipType> weaponFactory)
+        protected AbstractEquipments(int amount, IEquipmentFactory<TEquipment, TEquipType> equipmentFactory)
         {
             MaxEquipmentsAmount = amount;
-            EquipmentsFactory = weaponFactory;
+            EquipmentsFactory = equipmentFactory;
         }
 
         protected AbstractEquipments(IAbstractEquipments<TEquipment, TEquipType> baseEquipments)
@@ -52,10 +52,7 @@ namespace Ships
             }
         }
 
-        public TEquipment GetEquipment(int index)
-            => Equipments.TryGetValue(index, out var equipment) ? equipment : default;
-
-        public virtual void SetEquipment(int index, TEquipType equipType)
+        public virtual async Task SetEquipmentAsync(int index, TEquipType equipType)
         {
             if (index >= MaxEquipmentsAmount)
                 return;
@@ -65,10 +62,14 @@ namespace Ships
             else
                 equipment?.Unequip();
 
-            Equipments[index] = EquipmentsFactory.CreateEquipment(equipType, Slots[index]);
+            Equipments[index] = await EquipmentsFactory.CreateEquipment(equipType, Slots[index]);
         }
-
-        public Transform GetSlotTransform(int slotIndex)
-            => Slots.ContainsKey(slotIndex) ? Slots[slotIndex] : null;
+  
+        public void SetEquipmentSync(int index, TEquipType equipType)
+        {
+#pragma warning disable CS4014
+            SetEquipmentAsync(index, equipType);
+#pragma warning restore CS4014
+        }
     }
 }

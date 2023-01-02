@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Abstractions.Services;
 using Abstractions.Ships;
 using Enums;
 
 namespace Ships
 {
-    internal abstract class AbstractWeaponBattery : AbstractEquipments<IWeapon, WeaponType>, IWeaponBattery
+    public abstract class AbstractWeaponBattery : AbstractEquipments<IWeapon, WeaponType>, IWeaponBattery
     {
         public event Action<WeaponType> OnShoot;
 
@@ -41,9 +42,9 @@ namespace Ships
             _owner = owner;
         }
 
-        public override void SetEquipment(int index, WeaponType equipType)
+        public override async Task SetEquipmentAsync(int index, WeaponType equipType)
         {
-            base.SetEquipment(index, equipType);
+            await base.SetEquipmentAsync(index, equipType);
             Equipments[index].Init(_owner);
         }
 

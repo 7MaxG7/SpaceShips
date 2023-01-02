@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Abstractions.Ships;
 using Enums;
 using Infrastructure;
 
 namespace Abstractions
 {
-    internal interface IShipsInitializer : ICleanable
+    public interface IShipsInitializer : ISceneCleanable
     {
         Dictionary<OpponentId, IShip> Ships { get; }
         
-        void PrepareShips();
+        Task PrepareShipsAsync();
     }
 }

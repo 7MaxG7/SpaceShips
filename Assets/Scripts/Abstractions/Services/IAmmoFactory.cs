@@ -1,10 +1,12 @@
-﻿using Abstractions.Ships;
-using Enums;
+﻿using System.Threading.Tasks;
+using Abstractions.Ships;
+using Infrastructure;
 
 namespace Abstractions.Services
 {
-    internal interface IAmmoFactory
+    public interface IAmmoFactory : ISceneCleanable
     {
-        IAmmo CreateAmmo(WeaponType weaponType);
+        void PrepareRoot();
+        Task<IAmmo> SpawnAmmo(IWeapon weapon);
     }
 }

@@ -1,12 +1,13 @@
-﻿using Abstractions.Ships;
-using Configs.Data;
+﻿using System.Threading.Tasks;
+using Abstractions.Ships;
+using Ships;
 using UnityEngine;
 
 namespace Abstractions.Services
 {
-    internal interface IShipsFactory
+    public interface IShipsFactory
     {
-        IShip CreateShip(ShipData ship, Vector3 position, Quaternion rotation);
-        IDamagableView GenerateView(IShip ship, Vector3 position, Quaternion rotation);
+        void PrepareRoot();
+        Task<IShip> CreateShipAsync(ShipModel shipModel, Vector3 position, Quaternion rotation);
     }
 }

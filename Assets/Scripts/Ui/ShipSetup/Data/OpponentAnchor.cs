@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Ui.ShipSetup.Data
 {
     [Serializable]
-    internal class OpponentAnchor
+    public sealed class OpponentAnchor
     {
         [SerializeField] private OpponentId _opponentId;
         [SerializeField] private Vector2 _min;

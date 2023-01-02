@@ -1,27 +1,27 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Abstractions.Services;
-using Configs;
 using Ui;
 using Zenject;
 
 namespace Services
 {
-    internal class Curtain : ICurtain
+    public sealed class Curtain : ICurtain
     {
-        private readonly UiConfig _uiConfig;
+        private readonly IUiFactory _uiFactory;
+
         private CurtainView _curtainView;
 
         
         [Inject]
-        public Curtain(UiConfig uiConfig)
+        public Curtain(IUiFactory uiFactory)
         {
-            _uiConfig = uiConfig;
+            _uiFactory = uiFactory;
         }
 
-        public void Prepare(CurtainView curtainView)
+        public async Task InitAsync()
         {
-            _curtainView = curtainView;
-            _curtainView.Init(_uiConfig.CurtainAnimDuration);
+            _curtainView = await _uiFactory.CreateCurtainAsync();
         }
 
         public void ShowCurtain(bool isAnimated = true, Action callback = null)

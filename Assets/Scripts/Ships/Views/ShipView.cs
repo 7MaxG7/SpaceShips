@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Ships
 {
-    public class ShipView : MonoBehaviour, IDamagableView
+    public sealed class ShipView : MonoBehaviour, IDamagableView
     {
         [SerializeField] private ShieldView _shield;
         [SerializeField] private Transform[] _weaponSlots;

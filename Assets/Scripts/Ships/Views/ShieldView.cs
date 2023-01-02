@@ -2,9 +2,9 @@
 
 namespace Ships.Views
 {
-    public class ShieldView : MonoBehaviour
+    public sealed class ShieldView : MonoBehaviour
     {
-        private const float VISIBLE_SHIELD_TRESHOLD = .25f;
+        private const float VISIBLE_SHIELD_TRESHOLD = .2f;
 
     
         public void UpdatePower(float currentShield, float maxShield)

@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Abstractions.Ships;
 using Enums;
 using Services;
 
 namespace Ships
 {
-    internal class ShipModules : AbstractEquipments<IModule, ModuleType>, IShipModules
+    public sealed class ShipModules : AbstractEquipments<IModule, ModuleType>, IShipModules
     {
         public event Action<IModule> OnModuleEquiped;
         public event Action<IModule> OnModuleUnequip;
@@ -13,9 +14,9 @@ namespace Ships
 
         public ShipModules(int amount, IModuleFactory moduleFactory) : base(amount, moduleFactory) { }
 
-        public override void SetEquipment(int index, ModuleType equipType)
+        public override async Task SetEquipmentAsync(int index, ModuleType equipType)
         {
-            base.SetEquipment(index, equipType);
+            await base.SetEquipmentAsync(index, equipType);
             Equipments[index].OnModuleUnequip += InvokeModuleUninstall;
             OnModuleEquiped?.Invoke(Equipments[index]);
         }

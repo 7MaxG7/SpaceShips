@@ -1,6 +1,6 @@
 ﻿namespace Utils
 {
-    internal class Constants
+    public sealed class Constants
     {
         public const string BOOTSTRAP_SCENE_NAME = "BootstrapScene";
         public const string SETUP_SCENE_NAME = "SetupScene";

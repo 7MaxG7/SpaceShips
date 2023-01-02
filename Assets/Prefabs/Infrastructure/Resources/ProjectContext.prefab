@@ -105,3 +105,4 @@ MonoBehaviour:
   _rulesConfig: {fileID: 11400000, guid: 3e123e1b39d530d4f98693242f372a3b, type: 2}
   _uiConfig: {fileID: 11400000, guid: 7cd18251d58906845afe9663670f7798, type: 2}
   _soundConfig: {fileID: 11400000, guid: c18900ad80175d348b161820edf0b6d7, type: 2}
+  _assetsConfig: {fileID: 11400000, guid: 9f4173db96c9e414d9b1ea71dd70749b, type: 2}

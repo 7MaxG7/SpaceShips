@@ -3,7 +3,7 @@ using Zenject;
 
 namespace Infrastructure
 {
-    public class GameBootstrapper : MonoBehaviour, ICoroutineRunner
+    public sealed class GameBootstrapper : MonoBehaviour, ICoroutineRunner
     {
         private Game _game;
 
@@ -24,6 +24,6 @@ namespace Infrastructure
             => _game.Updater?.OnUpdate(Time.deltaTime);
 
         private void OnDestroy() 
-            => _game.Cleaner.CleanUp();
+            => _game.Cleaner?.CleanUp();
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Ui.ShipSetup.Data
 {
     [Serializable]
-    internal class SelectPanelAnchor
+    public sealed class SelectPanelAnchor
     {
         [SerializeField] private OpponentId _opponentId;
         [SerializeField] private Transform _anchor;

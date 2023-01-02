@@ -16,7 +16,15 @@ MonoBehaviour:
   _isActive: 1
   _damage: 20
   _cooldown: 5
-  _prefab: {fileID: 2807313212282586923, guid: be4152a665323e54cad9c6e4a3e6a9b7, type: 3}
-  _ammoPrefab: {fileID: 5017850904627532512, guid: c2b67005207bc964d89ccf6a161f2590, type: 3}
+  _prefab:
+    m_AssetGUID: be4152a665323e54cad9c6e4a3e6a9b7
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  _ammoPrefab:
+    m_AssetGUID: c2b67005207bc964d89ccf6a161f2590
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
   _ammoSpeed: 600
   _icon: {fileID: 21300000, guid: 4fc93f4b521b61d4e914d0961d355400, type: 3}

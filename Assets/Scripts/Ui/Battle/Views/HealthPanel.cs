@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace Ui.Battle.Views
 {
-    public class HealthPanel : MonoBehaviour
+    public sealed class HealthPanel : MonoBehaviour
     {
         [SerializeField] private OpponentId _opponent;
         [SerializeField] private Slider _hpSlider;
@@ -12,6 +12,7 @@ namespace Ui.Battle.Views
 
         public OpponentId OpponentId => _opponent;
 
+        
         public void SetCurrentHp(float currentHp, float maxHp) 
             => _hpSlider.value = ModifyToSliderValue(currentHp, maxHp);
 
@@ -22,6 +23,7 @@ namespace Ui.Battle.Views
         {
             if (maxValue <= 0)
                 return 0;
+            
             if (value < 0)
                 value = 0;
             return value / maxValue;

@@ -1,12 +1,11 @@
 ﻿using Abstractions.Ships;
-using Enums;
 using Infrastructure;
 
 namespace Abstractions.Services
 {
-    internal interface IAmmoPool : ICleanable
+    public interface IAmmoPool : ICleanable
     {
-        void Init();
-        IAmmo SpawnAmmo(WeaponType weaponWeaponType);
+        IAmmo SpawnAmmo(IWeapon weapon);
+        void RegisterAsSpawned(IAmmo ammo, IWeapon weapon);
     }
 }

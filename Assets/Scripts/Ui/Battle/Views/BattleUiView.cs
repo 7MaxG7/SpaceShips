@@ -9,7 +9,7 @@ using Utils;
 
 namespace Ui
 {
-    public class BattleUiView : MonoBehaviour
+    public sealed class BattleUiView : MonoBehaviour
     {
         [SerializeField] private HealthPanel[] _healthPanels;
         [SerializeField] private TMP_Text _winLable;

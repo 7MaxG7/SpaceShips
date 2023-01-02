@@ -3,7 +3,7 @@ using Ships;
 
 namespace Services
 {
-    internal interface IShipUpgrader
+    public interface IShipUpgrader
     {
         void Upgrade(Ship ship, IModule module);
         void Downgrade(Ship ship, IModule module);

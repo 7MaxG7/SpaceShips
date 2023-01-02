@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Ships.Data
 {
-    internal class UpgradedHealth : AbstractHealth, IDowngradable<IHealth>
+    public sealed class UpgradedHealth : AbstractHealth, IDowngradable<IHealth>
     {
         private IHealth _baseHealth;
         private readonly IModule _module;

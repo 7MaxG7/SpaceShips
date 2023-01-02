@@ -8,7 +8,7 @@ using Zenject;
 
 namespace Utils.Zenject
 {
-    public class ServicesInstaller : MonoInstaller
+    public sealed class ServicesInstaller : MonoInstaller
     {
         public override void InstallBindings()
         {
@@ -21,14 +21,17 @@ namespace Utils.Zenject
             Container.Bind<IAssetsProvider>().To<AssetsProvider>().AsSingle();
             Container.Bind<ISceneLoader>().To<SceneLoader>().AsSingle();
             Container.Bind<IShipsFactory>().To<ShipsFactory>().AsSingle();
-            Container.Bind<IAmmoPool>().To<AmmoPool>().AsSingle();
+            Container.Bind<IUiFactory>().To<UiFactory>().AsSingle();
             Container.Bind<IAmmoFactory>().To<AmmoFactory>().AsSingle();
             Container.Bind<IWeaponFactory>().To<WeaponFactory>().AsSingle();
             Container.Bind<IModuleFactory>().To<ModuleFactory>().AsSingle();
+            Container.Bind<IServicesFactory>().To<ServicesFactory>().AsSingle();
             Container.Bind<IShipUpgrader>().To<ShipUpgrader>().AsSingle();
-            Container.Bind<IShipsInteractor>().To<ShipsInteractor>().AsSingle();
+            Container.Bind<IBattleObserver>().To<BattleObserver>().AsSingle();
+            Container.Bind<IDamageHandler>().To<DamageHandler>().AsSingle();
             Container.Bind<ILocationFinder>().To<LocationFinder>().AsSingle();
             Container.Bind<ISoundPlayer>().To<SoundPlayer>().AsSingle();
+            Container.Bind<IShipConfigurationsHolder>().To<ShipConfigurationsHolder>().AsSingle();
         }
     }
 }

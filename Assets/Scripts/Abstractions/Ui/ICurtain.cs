@@ -1,11 +1,11 @@
 ﻿using System;
-using Ui;
+using System.Threading.Tasks;
 
 namespace Abstractions.Services
 {
-    internal interface ICurtain
+    public interface ICurtain
     {
-        void Prepare(CurtainView curtainView);
+        Task InitAsync();
         void ShowCurtain(bool isAnimated = true, Action callback = null);
         void HideCurtain(bool isAnimated = true, Action callback = null);
         void HideCurtain(float startDelay, Action callback = null);

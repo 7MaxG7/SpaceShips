@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure
 {
-    internal interface IGameState
+    public interface IGameState
     {
         void Init(IGameStateMachine gameStateMachine);
         public void Enter();

@@ -1,27 +1,66 @@
-﻿using Abstractions.Services;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Abstractions.Services;
 using Abstractions.Ships;
 using Enums;
-using Ships.Modules;
+using Infrastructure;
+using Ships.Views;
+using UnityEngine;
+using Utils;
 using Zenject;
+using Ammo = Ships.Modules.Ammo;
 
 namespace Services
 {
-    internal class AmmoFactory : IAmmoFactory
+    public sealed class AmmoFactory : IAmmoFactory
     {
         private readonly IAssetsProvider _assetsProvider;
+        private readonly IStaticDataService _staticDataService;
+        
+        private readonly Dictionary<WeaponType, IAmmoPool> _ammoPools = new();
+        private Transform _ammosParent;
 
 
         [Inject]
-        public AmmoFactory(IAssetsProvider assetsProvider)
+        public AmmoFactory(IAssetsProvider assetsProvider, IStaticDataService staticDataService, ICleaner cleaner)
         {
             _assetsProvider = assetsProvider;
+            _staticDataService = staticDataService;
+            cleaner.AddCleanable(this);
         }
-        
-        
-        public IAmmo CreateAmmo(WeaponType weaponType)
+
+        public void CleanUp()
         {
-            var ammoView = _assetsProvider.CreateAmmo(weaponType);
-            return new Ammo(ammoView, weaponType);
+            foreach (var pool in _ammoPools.Values) 
+                pool.CleanUp();
+            _ammoPools.Clear();
+        }
+
+        public void PrepareRoot()
+        {
+            if (_ammosParent == null)
+                _ammosParent = new GameObject(Constants.AMMOS_PARENT_NAME).transform;
+        }
+
+        public async Task<IAmmo> SpawnAmmo(IWeapon weapon)
+        {
+            var weaponType = weapon.WeaponType;
+            if (!_ammoPools.ContainsKey(weaponType)) 
+                _ammoPools.Add(weaponType, new AmmoPool());
+
+            return _ammoPools[weaponType].SpawnAmmo(weapon) ?? await CreateAmmo(weapon);
+        }
+
+        private async Task<IAmmo> CreateAmmo(IWeapon weapon)
+        {
+            var ammoData = _staticDataService.GetWeaponData(weapon.WeaponType);
+            if (ammoData == null)
+                return null;
+            
+            var ammoView = await _assetsProvider.CreateInstanceAsync<AmmoView>(ammoData.AmmoPrefab, _ammosParent);
+            var ammo = new Ammo(ammoView);
+            _ammoPools[weapon.WeaponType].RegisterAsSpawned(ammo, weapon);
+            return ammo;
         }
     }
 }

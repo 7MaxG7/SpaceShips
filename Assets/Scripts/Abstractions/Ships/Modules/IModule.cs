@@ -1,6 +1,5 @@
 ﻿using System;
 using Enums;
-using Ships.Views;
 
 namespace Abstractions.Ships
 {
@@ -16,7 +15,5 @@ namespace Abstractions.Ships
         bool IsShieldRecoveryRelativeSpeedup { get; }
         bool IsHpConstantIncrease { get; }
         bool IsShieldConstantIncrease { get; }
-        
-        void SetView(ModuleView view);
     }
 }

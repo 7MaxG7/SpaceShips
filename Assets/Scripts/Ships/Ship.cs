@@ -6,21 +6,21 @@ using Object = UnityEngine.Object;
 
 namespace Ships
 {
-    internal class Ship : IShip
+    public sealed class Ship : IShip
     {
         public event Action<IShip> OnDied;
 
-        public ShipType ShipType { get; }
         public IHealth Health { get; private set; }
         public IWeaponBattery WeaponBattery { get; private set; }
-        public IShipModules ShipModules { get; }
+        public IShipModules ShipModules { get; private set; }
         public string Name { get; }
-        public bool IsDead => Health.CurrentHp <= 0;
 
+        public ShipView ShipView { get; private set; }
+        private ShipType ShipType { get; }
+        private bool IsDead => Health.CurrentHp <= 0;
         private readonly IShipUpgrader _shipUpgrader;
-        private ShipView _shipView;
 
-        
+
         public Ship(ShipType shipType, IHealth health, IWeaponBattery weaponBattery, IShipModules shipModules,
             IShipUpgrader shipUpgrader)
         {
@@ -28,40 +28,43 @@ namespace Ships
             ShipType = shipType;
             SetHealth(health);
             SetWeapons(weaponBattery);
-            ShipModules = shipModules;
-            ShipModules.OnModuleEquiped += UpgradeShip;
-            ShipModules.OnModuleUnequip += DowngradeShip;
+            SetModules(shipModules);
             Name = ShipType.ToString();
+        }
+
+        public void CleanUp()
+        {
+            ShipModules.OnModuleEquiped -= UpgradeShip;
+            ShipModules.OnModuleUnequip -= DowngradeShip;
+            Health.OnShieldChanged -= ShipView.Shield.UpdatePower;
         }
 
         public void SetView(ShipView shipView)
         {
-            _shipView = shipView;
-            WeaponBattery.SetSlots(_shipView.WeaponSlots);
-            ShipModules.SetSlots(_shipView.ModuleSlots);
+            ShipView = shipView;
+            WeaponBattery.SetSlots(ShipView.WeaponSlots);
+            ShipModules.SetSlots(ShipView.ModuleSlots);
         }
 
         public void PrepareToBattle()
         {
-            Health.OnShieldChanged += _shipView.Shield.UpdatePower;
-            _shipView.Shield.UpdatePower(Health.CurrentShield, Health.MaxShield);
-        }
-
-        public void CleanUpView()
-        {
-            Health.OnShieldChanged -= _shipView.Shield.UpdatePower;
+            Health.OnShieldChanged += ShipView.Shield.UpdatePower;
+            ShipView.Shield.UpdatePower(Health.CurrentShield, Health.MaxShield);
         }
 
         public void TakeDamage(int damage)
         {
+            if (IsDead)
+                return;
+            
             Health.TakeDamage(damage);
-            if (Health.CurrentHp <= 0)
+            if (IsDead)
                 OnDied?.Invoke(this);
         }
 
         public void Kill()
         {
-            Object.Destroy(_shipView.gameObject);
+            Object.Destroy(ShipView.gameObject);
         }
 
         public void SetHealth(IHealth health)
@@ -73,11 +76,11 @@ namespace Ships
             WeaponBattery.Init(this);
         }
 
-        public void CleanUp()
+        private void SetModules(IShipModules shipModules)
         {
-            ShipModules.OnModuleEquiped -= UpgradeShip;
-            ShipModules.OnModuleUnequip -= DowngradeShip;
-            CleanUpView();
+            ShipModules = shipModules;
+            ShipModules.OnModuleEquiped += UpgradeShip;
+            ShipModules.OnModuleUnequip += DowngradeShip;
         }
 
         private void UpgradeShip(IModule module)

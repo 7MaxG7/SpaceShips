@@ -7,26 +7,33 @@ using Object = UnityEngine.Object;
 
 namespace Ships.Modules
 {
-    internal class Weapon : IWeapon
+    public sealed class Weapon : IWeapon
     {
+        public event Action<IAmmo> OnBulletHit;
+        
         public WeaponType WeaponType { get; }
         public bool IsReady => _cooldownTimer <= 0;
 
+        private readonly IAmmoFactory _ammoFactory;
+        private readonly IDamageHandler _damageHandler;
+        
+        private IShip _owner;
         private WeaponView _weaponView;
-        private float _cooldownTimer;
-        private float _shootCooldown;
+        
         private readonly int _damage;
         private readonly float _ammoSpeed;
-        private readonly IAmmoPool _ammoPool;
-        private IShip _owner;
+        private readonly float _shootCooldown;
+        private float _cooldownTimer;
 
 
-        public Weapon(float cooldown, int damage, float ammoSpeed, WeaponType weaponType, IAmmoPool ammoPool)
+        public Weapon(float cooldown, int damage, float ammoSpeed, WeaponType weaponType, IAmmoFactory ammoFactory,
+            IDamageHandler damageHandler)
         {
             _shootCooldown = cooldown;
             _damage = damage;
             _ammoSpeed = ammoSpeed;
-            _ammoPool = ammoPool;
+            _ammoFactory = ammoFactory;
+            _damageHandler = damageHandler;
             WeaponType = weaponType;
         }
 
@@ -38,21 +45,18 @@ namespace Ships.Modules
         public void SetView(WeaponView view)
             => _weaponView = view;
 
-        public bool TryDealDamage(IShip target)
+        public void TryDealDamage(IAmmo ammo, IDamagableView target)
         {
-            if (target == _owner)
-                return false;
-
-            target.TakeDamage(_damage);
-            return true;
+            if (_damageHandler.TryDealDamage(_owner, target, _damage))
+                OnBulletHit?.Invoke(ammo);
         }
 
         public void Reload() 
             => _cooldownTimer = 0;
 
-        public void Shoot()
+        public async void Shoot()
         {
-            var ammo = _ammoPool.SpawnAmmo(WeaponType);
+            var ammo = await _ammoFactory.SpawnAmmo(this);
             ammo.Activate(_weaponView.Barrel, this);
             ammo.Rigidbody.AddForce(_weaponView.Barrel.up * _ammoSpeed);
             RestoreCooldown();

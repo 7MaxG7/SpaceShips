@@ -8,7 +8,7 @@ using Utils;
 
 namespace Services
 {
-    internal class StaticDataService : IStaticDataService
+    public sealed class StaticDataService : IStaticDataService
     {
         private Dictionary<ShipType, ShipData> _shipDatas;
         private Dictionary<WeaponType,WeaponData> _weaponDatas;
@@ -43,14 +43,10 @@ namespace Services
                 ? data
                 : null;
 
-        public WeaponData[] GetAllEnabledWeaponsData()
-        {
-            return _weaponDatas.Values.Where(data => data.IsActive).ToArray();
-        }
+        public WeaponData[] GetAllEnabledWeaponsData() 
+            => _weaponDatas.Values.Where(data => data.IsActive).ToArray();
 
-        public ModuleData[] GetAllEnabledModulesData()
-        {
-            return _moduleDatas.Values.Where(data => data.IsActive).ToArray();
-        }
+        public ModuleData[] GetAllEnabledModulesData() 
+            => _moduleDatas.Values.Where(data => data.IsActive).ToArray();
     }
 }

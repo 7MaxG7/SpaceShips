@@ -1,13 +1,11 @@
-﻿using Abstractions.Services;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Abstractions.Services;
 using Configs;
-using Enums;
-using Ships;
-using Ships.Views;
-using Sounds;
-using Ui;
-using Ui.ShipSetup;
+using Infrastructure;
 using UnityEngine;
-using Utils;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using Zenject;
 using static UnityEngine.Object;
 
@@ -16,76 +14,79 @@ namespace Services
 {
     internal sealed class AssetsProvider : IAssetsProvider
     {
-        private readonly IStaticDataService _staticDataService;
-        private readonly SoundConfig _soundConfig;
-        private readonly UiConfig _uiConfig;
-        private Transform _shipsParent;
-        private Transform _ammosParent;
-        private Transform _rootCanvas;
+        private readonly ISceneLoader _sceneLoader;
+        private readonly AssetsConfig _assetsConfig;
+
+        private readonly Dictionary<string, AsyncOperationHandle> _loadedAssets = new();
+        private readonly List<AsyncOperationHandle> _handles = new();
+        private bool _isCleaned;
 
 
         [Inject]
-        public AssetsProvider(IStaticDataService staticDataService, SoundConfig soundConfig, UiConfig uiConfig)
+        public AssetsProvider(ISceneLoader sceneLoader, ICleaner cleaner, AssetsConfig assetsConfig)
         {
-            _staticDataService = staticDataService;
-            _soundConfig = soundConfig;
-            _uiConfig = uiConfig;
+            _sceneLoader = sceneLoader;
+            _assetsConfig = assetsConfig;
+            cleaner.AddCleanable(this);
+        }
+                
+        public void CleanUp()
+        {
+            if (_isCleaned)
+                return;
+
+            _isCleaned = true;
+            foreach (var handle in _handles) 
+                Addressables.Release(handle);
+            _handles.Clear();
+            _loadedAssets.Clear();
         }
 
-        public CurtainView CreateCurtain()
+        public void Init()
         {
-            return Instantiate(_uiConfig.CurtainPrefab);
+            Addressables.InitializeAsync();
         }
 
-        public void PrepareSetupShipRoots()
+        public async Task WarmUpCurrentSceneAsync()
         {
-            if (_rootCanvas == null)
-                _rootCanvas = Instantiate(_uiConfig.RootCanvas);
-            if (_shipsParent == null)
-                _shipsParent = new GameObject(Constants.SHIPS_PARENT_NAME).transform;
+            var sceneName = _sceneLoader.GetCurrentSceneName();
+            var assetReferences = _assetsConfig.GetAssetReferencesForState(sceneName);
+            foreach (var reference in assetReferences) 
+                await LoadAsync(reference);
         }
 
-        public void PrepareBattleRoots()
+        public async Task<T> CreateInstanceAsync<T>(AssetReference assetReference, Transform parent = null) where T : MonoBehaviour
+            => await CreateInstanceAsync<T>(assetReference, Vector3.zero, Quaternion.identity, parent, false);
+
+        public async Task<T> CreateInstanceAsync<T>(AssetReference assetReference, Vector3 position, Quaternion rotation
+            , Transform parent = null, bool isPositioned = true) where T : MonoBehaviour
         {
-            if (_rootCanvas == null)
-                _rootCanvas = Instantiate(_uiConfig.RootCanvas);
-            if (_shipsParent == null)
-                _shipsParent = new GameObject(Constants.SHIPS_PARENT_NAME).transform;
-            if (_ammosParent == null)
-                _ammosParent = new GameObject(Constants.AMMOS_PARENT_NAME).transform;
+            var prefab = await LoadAsync(assetReference);
+            return isPositioned
+                ? Instantiate(prefab, position, rotation, parent).GetComponent<T>()
+                : Instantiate(prefab, parent).GetComponent<T>();
         }
 
-        public ShipSetupMenuView CreateShipSetupMenu() 
-            => Instantiate(_uiConfig.ShipSetupMenu, _rootCanvas);
+        public async Task<GameObject> CreateInstanceAsync(AssetReference assetReference, Transform parent = null)
+        {
+            var prefab = await LoadAsync(assetReference);
+            return Instantiate(prefab, parent);
+        }
 
-        public BattleUiView CreateBattleUi()
-            => Instantiate(_uiConfig.BattleUiPrefab, _rootCanvas);
-
-        public SoundPlayerView CreateSoundPlayer()
-            => Instantiate(_soundConfig.SoundPlayerPrefab);
-
-        public ShipView CreateShip(ShipType shipType, Vector3 position, Quaternion rotation)
-            => Instantiate(_staticDataService.GetShipData(shipType).Prefab, position, rotation, _shipsParent);
-
-        public AmmoView CreateAmmo(WeaponType weaponType)
-            => Instantiate(_staticDataService.GetWeaponData(weaponType).AmmoPrefab, _ammosParent);
-
-        public ShipSlotUiView CreateEquipmentUiSlot(Transform parent)
-            => Instantiate(_uiConfig.ShipSlotUiPrefab, parent);
-
-        public SlotUiView CreateSelectEquipmentUiSlot(Transform parent) 
-            => Instantiate(_uiConfig.SlotUiPrefab, parent);
-
-        public Sprite GetWeaponIcon(WeaponType weaponType)
-            => _staticDataService.GetWeaponData(weaponType).Icon;
-
-        public Sprite GetModuleIcon(ModuleType moduleType)
-            => _staticDataService.GetModuleData(moduleType).Icon;
-
-        public WeaponView CreateWeapon(WeaponType weaponType, Transform parent)
-            => Instantiate(_staticDataService.GetWeaponData(weaponType).Prefab, parent);
-
-        public ModuleView CreateModule(ModuleType moduleType, Transform parent)
-            => Instantiate(_staticDataService.GetModuleData(moduleType).Prefab, parent);
+        private async Task<GameObject> LoadAsync(AssetReference assetReference)
+        {
+            _isCleaned = false;
+            
+            if (_loadedAssets.TryGetValue(assetReference.AssetGUID, out var loadedHandle))
+                return loadedHandle.Result as GameObject;
+            
+            var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
+            handle.Completed += resultHandle =>
+            {
+                _loadedAssets[assetReference.AssetGUID] = resultHandle;
+                _handles.Add(handle);
+            };
+            return await handle.Task;
+        }
     }
 }

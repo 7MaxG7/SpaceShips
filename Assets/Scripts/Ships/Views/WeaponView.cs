@@ -2,7 +2,7 @@
 
 namespace Ships.Views
 {
-    public class WeaponView : MonoBehaviour
+    public sealed class WeaponView : MonoBehaviour
     {
         [SerializeField] private Transform _barrel;
 

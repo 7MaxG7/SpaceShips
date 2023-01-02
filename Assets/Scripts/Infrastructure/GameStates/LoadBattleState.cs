@@ -1,7 +1,6 @@
 ﻿using Abstractions;
 using Abstractions.Services;
 using Services;
-using Sounds;
 using Utils;
 using Zenject;
 
@@ -11,37 +10,30 @@ namespace Infrastructure
     internal sealed class LoadBattleState : IGameState
     {
         private readonly ISceneLoader _sceneLoader;
-        private readonly IShipsInteractor _shipsInteractor;
-        private readonly ILocationFinder _locationFinder;
-        private readonly IShipsFactory _shipsFactory;
-        private readonly IWeaponFactory _weaponFactory;
-        private readonly IAmmoPool _ammoPool;
+        private readonly IBattleObserver _battleObserver;
         private readonly IAssetsProvider _assetsProvider;
-        private readonly IModuleFactory _moduleFactory;
         private readonly IShipsInitializer _shipsInitializer;
-        private readonly ISoundPlayer _soundPlayer;
+        private readonly IAmmoFactory _ammoFactory;
+        private readonly IUiFactory _uiFactory;
+        private readonly IDamageHandler _damageHandler;
         private IGameStateMachine _stateMachine;
 
 
         [Inject]
-        public LoadBattleState(ISceneLoader sceneLoader, IShipsInteractor shipsInteractor, ILocationFinder locationFinder
-            , IShipsFactory shipsFactory, IWeaponFactory weaponFactory, IAmmoPool ammoPool, IAssetsProvider assetsProvider, IModuleFactory moduleFactory, IShipsInitializer shipsInitializer
-            , ISoundPlayer soundPlayer)
+        public LoadBattleState(ISceneLoader sceneLoader, IBattleObserver battleObserver, IAssetsProvider assetsProvider
+            , IShipsInitializer shipsInitializer, IAmmoFactory ammoFactory, IUiFactory uiFactory, IDamageHandler damageHandler)
         {
             _sceneLoader = sceneLoader;
-            _shipsInteractor = shipsInteractor;
-            _locationFinder = locationFinder;
-            _shipsFactory = shipsFactory;
-            _weaponFactory = weaponFactory;
-            _ammoPool = ammoPool;
+            _battleObserver = battleObserver;
             _assetsProvider = assetsProvider;
-            _moduleFactory = moduleFactory;
             _shipsInitializer = shipsInitializer;
-            _soundPlayer = soundPlayer;
+            _ammoFactory = ammoFactory;
+            _uiFactory = uiFactory;
+            _damageHandler = damageHandler;
         }
 
         public void Enter()
-            => _sceneLoader.LoadScene(Constants.BATTLE_SCENE_NAME, PrepareScene);
+            => _sceneLoader.LoadScene(Constants.BATTLE_SCENE_NAME, PrepareSceneAsync);
 
         public void Exit()
         {
@@ -52,9 +44,11 @@ namespace Infrastructure
             _stateMachine = stateMachine;
         }
 
-        private void PrepareScene()
+        private async void PrepareSceneAsync()
         {
-            _assetsProvider.PrepareBattleRoots();
+            await _assetsProvider.WarmUpCurrentSceneAsync();
+            await _uiFactory.PrepareCanvasAsync();
+            _ammoFactory.PrepareRoot();
             PrepareOpponents();
             
             _stateMachine.Enter<RunBattleState>();
@@ -62,34 +56,13 @@ namespace Infrastructure
 
         private void PrepareOpponents()
         {
-            _ammoPool.Init();
-            foreach (var opponent in _shipsInitializer.Ships)
+            _shipsInitializer.PrepareShipsAsync();
+            
+            foreach (var ship in _shipsInitializer.Ships.Values)
             {
-                var position = _locationFinder.GetOpponentLocation(opponent.Key, out var rotation);
-                if (!position.HasValue)
-                    continue;
-                var view = _shipsFactory.GenerateView(opponent.Value, position.Value, rotation);
-
-                var weapons = opponent.Value.WeaponBattery;
-                for (var i = 0; i < weapons.MaxEquipmentsAmount; i++)
-                {
-                    var weapon = weapons.GetEquipment(i);
-                    if (weapon != null)
-                        _weaponFactory.GenerateView(weapon, weapons.GetSlotTransform(i));
-                }
-                weapons.OnShoot += _soundPlayer.PlayShoot;
-
-                var modules = opponent.Value.ShipModules;
-                for (var i = 0; i < modules.MaxEquipmentsAmount; i++)
-                {
-                    var module = modules.GetEquipment(i);
-                    if (module != null)
-                        _moduleFactory.GenerateView(module, modules.GetSlotTransform(i));
-                }
-
-                opponent.Value.PrepareToBattle();
-
-                _shipsInteractor.AddShip(opponent.Value, view);
+                ship.PrepareToBattle();
+                _battleObserver.AddShip(ship);
+                _damageHandler.AddShip(ship);
             }
         }
     }

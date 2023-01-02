@@ -1,39 +1,40 @@
-﻿using Abstractions.Services;
+﻿using System.Threading.Tasks;
+using Abstractions.Services;
 using Abstractions.Ships;
 using Enums;
 using Ships.Modules;
+using Ships.Views;
 using UnityEngine;
 using Zenject;
 
 namespace Services
 {
-    internal class WeaponFactory : IWeaponFactory
+    public sealed class WeaponFactory : IWeaponFactory
     {
         private readonly IStaticDataService _staticDataService;
         private readonly IAssetsProvider _assetsProvider;
-        private readonly IAmmoPool _ammoPool;
+        private readonly IAmmoFactory _ammoFactory;
+        private readonly IDamageHandler _damageHandler;
 
-        
+
         [Inject]
-        public WeaponFactory(IStaticDataService staticDataService, IAssetsProvider assetsProvider, IAmmoPool ammoPool)
+        public WeaponFactory(IStaticDataService staticDataService, IAssetsProvider assetsProvider, IAmmoFactory ammoFactory
+            , IDamageHandler damageHandler)
         {
             _staticDataService = staticDataService;
             _assetsProvider = assetsProvider;
-            _ammoPool = ammoPool;
+            _ammoFactory = ammoFactory;
+            _damageHandler = damageHandler;
         }
         
-        public IWeapon CreateEquipment(WeaponType weaponType, Transform parent)
+        public async Task<IWeapon> CreateEquipment(WeaponType weaponType, Transform parent)
         {
             var weaponData = _staticDataService.GetWeaponData(weaponType);
-            var weapon = new Weapon(weaponData.Cooldown, weaponData.Damage, weaponData.AmmoSpeed, weaponType, _ammoPool);
-            GenerateView(weapon, parent);
-            return weapon;
-        }
-
-        public void GenerateView(IWeapon weapon, Transform parent)
-        {
-            var view = _assetsProvider.CreateWeapon(weapon.WeaponType, parent);
+            var weapon = new Weapon(weaponData.Cooldown, weaponData.Damage, weaponData.AmmoSpeed, weaponType, _ammoFactory
+                , _damageHandler);
+            var view = await _assetsProvider.CreateInstanceAsync<WeaponView>(weaponData.Prefab, parent);
             weapon.SetView(view);
+            return weapon;
         }
     }
 }

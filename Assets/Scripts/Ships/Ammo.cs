@@ -1,17 +1,12 @@
-﻿using System;
-using Abstractions.Ships;
-using Enums;
+﻿using Abstractions.Ships;
 using Ships.Views;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Ships.Modules
 {
-    internal class Ammo : IAmmo
+    public sealed class Ammo : IAmmo
     {
-        public event Action<IAmmo, IWeapon, IDamagableView> OnReachedDamagable;
-        
-        public WeaponType WeaponType { get; }
         public Rigidbody2D Rigidbody => _ammoView.Rigidbody;
 
         private Transform Transform => _ammoView.transform;
@@ -19,11 +14,17 @@ namespace Ships.Modules
         private IWeapon _shooter;
 
 
-        public Ammo(AmmoView view, WeaponType weaponType)
+        public Ammo(AmmoView view)
         {
-            WeaponType = weaponType;
             _ammoView = view;
             _ammoView.OnTriggerEntered += HandleCollision;
+        }
+
+        public void CleanUp()
+        {
+            _ammoView.OnTriggerEntered -= HandleCollision;
+            if (_ammoView != null && _ammoView.gameObject != null)
+                Object.Destroy(_ammoView.gameObject);
         }
 
         public void Activate(Transform start, IWeapon shooter)
@@ -41,17 +42,10 @@ namespace Ships.Modules
             _ammoView.gameObject.SetActive(false);
         }
 
-        public void CleanUp()
-        {
-            _ammoView.OnTriggerEntered -= HandleCollision;
-            if (_ammoView != null && _ammoView.gameObject != null)
-                Object.Destroy(_ammoView.gameObject);
-        }
-
         private void HandleCollision(Collider2D collider)
         {
             if (collider.TryGetComponent<IDamagableView>(out var damageTaker))
-                OnReachedDamagable?.Invoke(this, _shooter, damageTaker);
+                _shooter.TryDealDamage(this, damageTaker);
         }
     }
 }

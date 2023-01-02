@@ -3,7 +3,7 @@ using Enums;
 
 namespace Abstractions.Services
 {
-    internal interface IStaticDataService
+    public interface IStaticDataService
     {
         void Init();
         ShipData GetShipData(ShipType shipType);

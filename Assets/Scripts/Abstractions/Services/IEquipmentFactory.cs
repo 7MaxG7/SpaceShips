@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Abstractions.Services
 {
-    public interface IEquipmentFactory<TEquipment, TEquipType>
+    public interface IEquipmentFactory<TEquipment, in TEquipType>
     {
-        TEquipment CreateEquipment(TEquipType type, Transform parent);
-        void GenerateView(TEquipment equipment, Transform parent);
+        Task<TEquipment> CreateEquipment(TEquipType type, Transform parent);
     }
 }

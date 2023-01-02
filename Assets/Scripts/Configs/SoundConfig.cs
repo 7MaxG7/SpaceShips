@@ -2,19 +2,19 @@
 using System.Linq;
 using Configs.Data;
 using Enums;
-using Sounds;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace Configs
 {
     [CreateAssetMenu(menuName = "Configs/" + nameof(SoundConfig), fileName = nameof(SoundConfig))]
-    internal class SoundConfig : ScriptableObject
+    public class SoundConfig : ScriptableObject
     {
-        [SerializeField] private SoundPlayerView _soundPlayerPrefab;
+        [SerializeField] private AssetReference _soundPlayerPrefab;
         [SerializeField] private WeaponSound[] _weaponSounds;
         [SerializeField] private AudioClip _musicClip;
 
-        public SoundPlayerView SoundPlayerPrefab => _soundPlayerPrefab;
+        public AssetReference SoundPlayerPrefab => _soundPlayerPrefab;
         public AudioClip MusicClip => _musicClip;
 
 

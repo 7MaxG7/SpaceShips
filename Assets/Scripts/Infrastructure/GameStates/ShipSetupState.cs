@@ -1,4 +1,5 @@
-﻿using Abstractions;
+﻿using System.Threading.Tasks;
+using Abstractions;
 using Abstractions.Services;
 using Configs;
 using Sounds;
@@ -14,29 +15,35 @@ namespace Infrastructure
 
         private readonly ICurtain _curtain;
         private readonly IShipsInitializer _shipsInitializer;
-        private readonly IAssetsProvider _assetsProvider;
         private readonly ISoundPlayer _soundPlayer;
         private readonly IStaticDataService _staticDataService;
+        private readonly IAssetsProvider _assetsProvider;
+        private readonly IUiFactory _uiFactory;
+        private readonly ICleaner _cleaner;
         private readonly UiConfig _uiConfig;
+        
         private IGameStateMachine _stateMachine;
-        private ShipSetupMenuController _shipSetupMenuController;
+        private ShipSetupMenuController _shipSetupMenu;
 
 
         [Inject]
-        public ShipSetupState(ICurtain curtain, IShipsInitializer shipsInitializer, IAssetsProvider assetsProvider
-            , ISoundPlayer soundPlayer, IStaticDataService staticDataService, UiConfig uiConfig)
+        public ShipSetupState(ICurtain curtain, IShipsInitializer shipsInitializer, IStaticDataService staticDataService
+            , ISoundPlayer soundPlayer, IAssetsProvider assetsProvider, IUiFactory uiFactory, ICleaner cleaner, UiConfig uiConfig)
         {
             _curtain = curtain;
             _shipsInitializer = shipsInitializer;
-            _assetsProvider = assetsProvider;
             _soundPlayer = soundPlayer;
             _staticDataService = staticDataService;
+            _assetsProvider = assetsProvider;
+            _uiFactory = uiFactory;
+            _cleaner = cleaner;
             _uiConfig = uiConfig;
         }
 
-        public void Enter()
+        public async void Enter()
         {
-            PrepareSetupScene();
+            await _assetsProvider.WarmUpCurrentSceneAsync();
+            await PrepareSetupSceneAsync();
             _soundPlayer.PlayMusic();
             // Delay prevents lagging animation on load after bootstrap
             _curtain.HideCurtain(CURTAIN_HIDE_DELAY);
@@ -44,8 +51,8 @@ namespace Infrastructure
 
         public void Exit()
         {
-            _shipSetupMenuController.OnSetupComplete -= SwitchState;
-            _shipSetupMenuController.CleanUp();
+            _shipSetupMenu.OnSetupComplete -= SwitchState;
+            _shipSetupMenu.CleanUp();
         }
 
         public void Init(IGameStateMachine stateMachine)
@@ -53,14 +60,20 @@ namespace Infrastructure
             _stateMachine = stateMachine;
         }
 
-        private void PrepareSetupScene()
+        private async Task PrepareSetupSceneAsync()
         {
-            _assetsProvider.PrepareSetupShipRoots();
-            _shipsInitializer.PrepareShips();
-            _shipSetupMenuController =
-                new ShipSetupMenuController(_assetsProvider, _staticDataService, _uiConfig, _stateMachine.CoroutineRunner);
-            _shipSetupMenuController.PrepareUi(_shipsInitializer.Ships);
-            _shipSetupMenuController.OnSetupComplete += SwitchState;
+            await _uiFactory.PrepareCanvasAsync();
+            await _shipsInitializer.PrepareShipsAsync();
+            await SetupUiAsync();
+        }
+
+        private async Task SetupUiAsync()
+        {
+            _shipSetupMenu = await _uiFactory.CreateShipSetupMenuAsync();
+            _shipSetupMenu.Init(_staticDataService, _uiFactory, _stateMachine.CoroutineRunner, _uiConfig);
+            await _shipSetupMenu.SetupUiAsync(_shipsInitializer.Ships.Keys);
+            _shipSetupMenu.OnSetupComplete += SwitchState;
+            _cleaner.AddCleanable(_shipSetupMenu);
         }
 
         private void SwitchState() 

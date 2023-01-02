@@ -1,13 +1,15 @@
-﻿using Abstractions.Services;
+﻿using System.Threading.Tasks;
+using Abstractions.Services;
 using Abstractions.Ships;
 using Enums;
 using Ships;
+using Ships.Views;
 using UnityEngine;
 using Zenject;
 
 namespace Services
 {
-    internal class ModuleFactory : IModuleFactory
+    public sealed class ModuleFactory : IModuleFactory
     {
         private readonly IStaticDataService _staticDataService;
         private readonly IAssetsProvider _assetsProvider;
@@ -20,18 +22,13 @@ namespace Services
             _assetsProvider = assetsProvider;
         }
         
-        public IModule CreateEquipment(ModuleType moduleType, Transform parent)
+        public async Task<IModule> CreateEquipment(ModuleType moduleType, Transform parent)
         {
             var moduleData = _staticDataService.GetModuleData(moduleType);
             var module = new Module(moduleData.EffectType, moduleData.MathType, moduleData.Value, moduleData.ModuleType);
-            GenerateView(module, parent);
-            return module;
-        }
-
-        public void GenerateView(IModule module, Transform parent)
-        {
-            var view = _assetsProvider.CreateModule(module.ModuleType, parent);
+            var view = await _assetsProvider.CreateInstanceAsync<ModuleView>(moduleData.Prefab, parent);
             module.SetView(view);
+            return module;
         }
     }
 }

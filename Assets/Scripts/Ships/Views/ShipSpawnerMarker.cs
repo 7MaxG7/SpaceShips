@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Ships.Views
 {
-    public class ShipSpawnerMarker : MonoBehaviour
+    public sealed class ShipSpawnerMarker : MonoBehaviour
     {
         [SerializeField] private OpponentId _opponentId;
 

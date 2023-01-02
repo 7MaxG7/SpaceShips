@@ -1,6 +1,6 @@
 ﻿namespace Enums
 {
-    internal enum EquipmentType
+    public enum EquipmentType
     {
         None = 0,
         Weapon = 1,

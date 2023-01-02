@@ -3,7 +3,7 @@ using Abstractions.Ships;
 
 namespace Ships.Data
 {
-    internal abstract class AbstractHealth : IHealth
+    public abstract class AbstractHealth : IHealth
     {
         public event Action<float, float> OnHpChanged;
         public event Action<float, float> OnShieldChanged;
@@ -17,6 +17,9 @@ namespace Ships.Data
             get => _currentHp;
             private set
             {
+                if (_currentHp.Equals(value))
+                    return;
+                
                 _currentHp = value;
                 _currentHp = Math.Clamp(value, 0, MaxHp);
                 OnHpChanged?.Invoke(_currentHp, MaxHp);
@@ -28,6 +31,9 @@ namespace Ships.Data
             get => _currentShield;
             private set
             {
+                if (_currentShield.Equals(value))
+                    return;
+                
                 _currentShield = Math.Clamp(value, 0, MaxShield);
                 OnShieldChanged?.Invoke(_currentShield, MaxShield);
             }

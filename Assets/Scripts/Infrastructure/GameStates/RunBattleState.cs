@@ -1,4 +1,5 @@
-﻿using Abstractions;
+﻿using System.Threading.Tasks;
+using Abstractions;
 using Abstractions.Services;
 using Abstractions.Ships;
 using Ui.Battle;
@@ -9,40 +10,39 @@ namespace Infrastructure
 {
     internal sealed class RunBattleState : IGameState
     {
-        private readonly IAssetsProvider _assetsProvider;
         private readonly ICurtain _curtain;
-        private readonly IShipsInteractor _shipsInteractor;
+        private readonly IBattleObserver _battleObserver;
         private readonly IShipsInitializer _shipsInitializer;
-        private readonly IUpdater _controllers;
-        private BattleUi _battleUi;
+        private readonly IUpdater _updater;
+        private readonly IUiFactory _uiFactory;
         private IGameStateMachine _stateMachine;
+        
+        private BattleUiController _battleUi;
 
 
         [Inject]
-        public RunBattleState(IAssetsProvider assetsProvider, ICurtain curtain, IShipsInteractor shipsInteractor
-            , IShipsInitializer shipsInitializer, IUpdater controllers)
+        public RunBattleState(ICurtain curtain, IBattleObserver battleObserver, IShipsInitializer shipsInitializer
+            , IUpdater updater, IUiFactory uiFactory)
         {
-            _assetsProvider = assetsProvider;
             _curtain = curtain;
-            _shipsInteractor = shipsInteractor;
+            _battleObserver = battleObserver;
             _shipsInitializer = shipsInitializer;
-            _controllers = controllers;
+            _updater = updater;
+            _uiFactory = uiFactory;
         }
         
-        public void Enter()
+        public async void Enter()
         {
-            _battleUi = new BattleUi(_assetsProvider);
-            _battleUi.PrepareUi(_shipsInitializer.Ships);
+            await SetupUi();
+            _battleObserver.OnWinnerDefined += HandleBattleStop;
             _curtain.HideCurtain(callback: StartBattle);
-            _shipsInteractor.OnWinnerDefined += HandleBattleStop;
-            _battleUi.OnBattleLeaved += LeaveBattle;
         }
 
         public void Exit()
         {
             _battleUi.CleanUp();
-            _shipsInteractor.OnWinnerDefined -= HandleBattleStop;
-            _battleUi.OnBattleLeaved -= LeaveBattle;
+            _battleObserver.OnWinnerDefined -= HandleBattleStop;
+            _battleUi.OnBattleLeft -= LeaveBattle;
         }
 
         public void Init(IGameStateMachine stateMachine)
@@ -50,23 +50,30 @@ namespace Infrastructure
             _stateMachine = stateMachine;
         }
 
+        private async Task SetupUi()
+        {
+            _battleUi = await _uiFactory.CreateBattleUiAsync();
+            _battleUi.SetupUi(_shipsInitializer.Ships);
+            _battleUi.OnBattleLeft += LeaveBattle;
+        }
+
         private void StartBattle()
         {
-            foreach (var ship in _shipsInteractor.Ships.Values)
+            foreach (var ship in _battleObserver.Ships)
             {
-                _controllers.AddUpdatable(ship.Health);
-                _controllers.AddUpdatable(ship.WeaponBattery);
+                _updater.AddUpdatable(ship.Health);
+                _updater.AddUpdatable(ship.WeaponBattery);
                 ship.WeaponBattery.ToggleShooting(true);
             }
         }
 
         private void HandleBattleStop(IShip winner)
         {
-            foreach (var ship in _shipsInteractor.Ships.Values)
+            foreach (var ship in _battleObserver.Ships)
             {
                 ship.WeaponBattery.ToggleShooting(false);
-                _controllers.RemoveController(ship.Health);
-                _controllers.RemoveController(ship.WeaponBattery);
+                _updater.RemoveController(ship.Health);
+                _updater.RemoveController(ship.WeaponBattery);
             }
 
             _battleUi.ShowBattleEnd(winner);

@@ -1,18 +1,19 @@
-﻿using Enums;
-using Ships.Views;
+﻿using System;
+using Enums;
 
 namespace Abstractions.Ships
 {
     public interface IWeapon : IEquipment
     {
+        event Action<IAmmo> OnBulletHit;
+
         bool IsReady { get; }
         WeaponType WeaponType { get; }
 
         void Init(IShip owner);
         void Shoot();
         void ReduceCooldown(float deltaTime);
-        void SetView(WeaponView view);
-        bool TryDealDamage(IShip target);
+        void TryDealDamage(IAmmo ammo, IDamagableView target);
         void Reload();
     }
 }

@@ -1,21 +1,11 @@
-using System.Collections.Generic;
-using Configs.Data;
+using System.Threading.Tasks;
 using Enums;
 
 namespace Ui.ShipSetup
 {
-    public class WeaponSelectView : AbstractEquipmentSelectView<WeaponType>
+    public sealed class WeaponSelectView : AbstractEquipmentSelectView<WeaponType>
     {
-        public void SetupWeaponSelectPanel(IEnumerable<WeaponData> weaponDatas)
-        {
-            foreach (var data in weaponDatas)
-            {
-                var weaponSlot = AssetsProvider.CreateSelectEquipmentUiSlot(EquipmentsContent);
-                weaponSlot.SetIcon(AssetsProvider.GetWeaponIcon(data.WeaponType));
-                weaponSlot.SelectButton.onClick.AddListener(() => InvokeEquipmentSelect(data.WeaponType));
-                EquipmentsSlots.Add(weaponSlot);
-            }
-            AjustSize();
-        }
+        protected override async Task<SlotUiView> CreateSelectUiSlot(WeaponType weaponType) 
+            => await UiFactory.CreateSelectWeaponUiSlotAsync(weaponType, EquipmentsContent);
     }
 }

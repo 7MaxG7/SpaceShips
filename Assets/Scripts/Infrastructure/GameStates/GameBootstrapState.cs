@@ -1,4 +1,6 @@
-﻿using Abstractions.Services;
+﻿using System.Threading.Tasks;
+using Abstractions.Services;
+using Configs;
 using DG.Tweening;
 using Services;
 using Sounds;
@@ -15,23 +17,28 @@ namespace Infrastructure
         private readonly ICurtain _curtain;
         private readonly IAssetsProvider _assetsProvider;
         private readonly ISoundPlayer _soundPlayer;
+        private readonly RulesConfig _rulesConfig;
+        private readonly IShipConfigurationsHolder _configurationsHolder;
         private IGameStateMachine _stateMachine;
 
 
         [Inject]
         public GameBootstrapState(IStaticDataService staticDataService, ISceneLoader sceneLoader, ICurtain curtain
-            , IAssetsProvider assetsProvider, ISoundPlayer soundPlayer)
+            , IAssetsProvider assetsProvider, ISoundPlayer soundPlayer, RulesConfig rulesConfig
+            , IShipConfigurationsHolder configurationsHolder)
         {
             _staticDataService = staticDataService;
             _sceneLoader = sceneLoader;
             _curtain = curtain;
             _assetsProvider = assetsProvider;
             _soundPlayer = soundPlayer;
+            _rulesConfig = rulesConfig;
+            _configurationsHolder = configurationsHolder;
         }
 
-        public void Enter()
+        public async void Enter()
         {
-            PrepareServices();
+            await PrepareServicesAsync();
             _sceneLoader.LoadScene(Constants.SETUP_SCENE_NAME, _stateMachine.Enter<ShipSetupState>);
         }
 
@@ -44,14 +51,15 @@ namespace Infrastructure
             _stateMachine = stateMachine;
         }
 
-        private void PrepareServices()
+        private async Task PrepareServicesAsync()
         {
             DOTween.Init();
-            var curtainView = _assetsProvider.CreateCurtain();
-            _curtain.Prepare(curtainView);
+            _assetsProvider.Init();
+            await _curtain.InitAsync();
             _curtain.ShowCurtain(false);
             _staticDataService.Init();
-            _soundPlayer.Init();
+            _configurationsHolder.Init(_rulesConfig.Opponents);
+            await _soundPlayer.InitAsync();
         }
     }
 }

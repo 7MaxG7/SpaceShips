@@ -1,75 +1,42 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Abstractions.Services;
-using Abstractions.Ships;
 using Enums;
 using Infrastructure;
+using Ships;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Ui.ShipSetup
 {
-    internal class ShipPanelController : ICleanable
+    public sealed class ShipPanelController : ICleanable
     {
         public event Action<OpponentId, int> OnWeaponSelectClick;
         public event Action<OpponentId, int> OnModuleSelectClick;
 
-        private readonly IAssetsProvider _assetsProvider;
+        private readonly IUiFactory _uiFactory;
+        
         private readonly ShipSetupPanelView _shipPanelView;
+        private readonly Dictionary<WeaponType, Sprite> _weaponIcons;
+        private readonly Dictionary<ModuleType, Sprite> _moduleIcons;
+        
+        private ShipModel _shipModel;
+        
         private readonly List<ShipSlotUiView> _weaponSlots = new();
         private readonly List<ShipSlotUiView> _moduleSlots = new();
         private bool _isCleaned;
-
         private OpponentId OpponentId => _shipPanelView.OpponentId;
         
 
-        public ShipPanelController(IAssetsProvider assetsProvider, ShipSetupPanelView shipPanelView)
+        public ShipPanelController(ShipSetupPanelView shipPanelView, IUiFactory uiFactory
+            , Dictionary<WeaponType,Sprite> weaponIcons, Dictionary<ModuleType,Sprite> moduleIcons)
         {
-            _assetsProvider = assetsProvider;
             _shipPanelView = shipPanelView;
-        }
-
-        public void Init(IShip ship)
-        {
-            InitWeaponSlots(ship.WeaponBattery);
-            InitModuleSlots(ship.ShipModules);
-        }
-
-        public void SwitchEquipmentIcon(int slotIndex, EquipmentType type, int typeIndex)
-        {
-            SlotUiView slot = null;
-            Sprite icon = null;
-            switch (type)
-            {
-                case EquipmentType.Weapon:
-                    slot = _weaponSlots.FirstOrDefault(item => item.Index == slotIndex);
-                    icon = _assetsProvider.GetWeaponIcon((WeaponType)typeIndex);
-                    break;
-                case EquipmentType.Module:
-                    slot = _moduleSlots.FirstOrDefault(item => item.Index == slotIndex);
-                    icon = _assetsProvider.GetModuleIcon((ModuleType)typeIndex);
-                    break;
-                default:
-                    Debug.LogError($"{this}: No icon for type {type.ToString()}");
-                    break;
-            }
-            if (slot != null)
-                slot.SetIcon(icon);
-        }
-
-        public Transform GetEquipmentSelectAnchor(EquipmentType type, int index)
-        {
-            switch (type)
-            {
-                case EquipmentType.Weapon:
-                    return _weaponSlots.FirstOrDefault(slot => slot.Index == index)?.SelectPanelAnchor;
-                case EquipmentType.Module:
-                    return _moduleSlots.FirstOrDefault(slot => slot.Index == index)?.SelectPanelAnchor;
-                default:
-                    Debug.LogError($"{this}: No anchor for type {type.ToString()} index {index}");
-                    return null;
-            }
+            _uiFactory = uiFactory;
+            _weaponIcons = weaponIcons;
+            _moduleIcons = moduleIcons;
         }
 
         public void CleanUp()
@@ -78,6 +45,9 @@ namespace Ui.ShipSetup
                 return;
             _isCleaned = true;
             
+            _shipModel.OnWeaponChange -= SwitchWeaponIcon;
+            _shipModel.OnModuleChange -= SwitchModuleIcon;
+
             foreach (var slot in _weaponSlots)
             {
                 slot.SelectButton.onClick.RemoveAllListeners();
@@ -95,43 +65,109 @@ namespace Ui.ShipSetup
             _moduleSlots.Clear();
         }
 
-        private void InitWeaponSlots(IWeaponBattery shipWeapons)
+        public async Task InitAsync(ShipModel shipModel, int weaponsAmount, int modulesAmount)
         {
-            CheckSlotsAmount(shipWeapons.MaxEquipmentsAmount, _weaponSlots, _shipPanelView.WeaponSlotsContent, out var newSlots);
-            foreach (var slot in newSlots)
-            {
-                var shipSlot = slot;
-                shipSlot.SelectButton.onClick.AddListener(() => InvokeWeaponSelect(shipSlot.Index));
-            }
-            for (var i = 0; i < _weaponSlots.Count; i++)
-            {
-                if (!TryInitSlot(shipWeapons.MaxEquipmentsAmount, _weaponSlots[i], i))
-                    continue;
-                var weapon = shipWeapons.GetEquipment(i);
-                if (weapon == null)
-                    continue;
+            _shipModel = shipModel;
+            _shipModel.OnWeaponChange += SwitchWeaponIcon;
+            _shipModel.OnModuleChange += SwitchModuleIcon;
+            await SetupWeaponSlotsAsync(weaponsAmount);
+            await SetupModuleSlotsAsync(modulesAmount);
+        }
 
-                _weaponSlots[i].SetIcon(_assetsProvider.GetWeaponIcon(weapon.WeaponType));
+        public Transform GetEquipmentSelectAnchor(EquipmentType type, int index)
+        {
+            switch (type)
+            {
+                case EquipmentType.Weapon:
+                    return _weaponSlots.FirstOrDefault(slot => slot.Index == index)?.SelectPanelAnchor;
+                case EquipmentType.Module:
+                    return _moduleSlots.FirstOrDefault(slot => slot.Index == index)?.SelectPanelAnchor;
+                default:
+                    Debug.LogError($"{this}: No anchor for type {type.ToString()} index {index}");
+                    return null;
             }
         }
 
-        private void InitModuleSlots(IShipModules shipModules)
+        private async Task SetupWeaponSlotsAsync(int weaponsAmount)
         {
-            CheckSlotsAmount(shipModules.MaxEquipmentsAmount, _moduleSlots, _shipPanelView.ModuleSlotsContent, out var newSlots);
-            foreach (var slot in newSlots)
+            await CheckSlotsAmountAsync(weaponsAmount, _weaponSlots, _shipPanelView.WeaponSlotsContent, EquipmentType.Weapon);
+
+            for (var slotIndex = 0; slotIndex < weaponsAmount; slotIndex++)
             {
-                var shipSlot = slot;
-                shipSlot.SelectButton.onClick.AddListener(() => InvokeModuleSelect(shipSlot.Index));
-            }
-            for (var index = 0; index < _moduleSlots.Count; index++)
-            {
-                if (!TryInitSlot(shipModules.MaxEquipmentsAmount, _moduleSlots[index], index))
-                    continue;
-                var module = shipModules.GetEquipment(index);
-                if (module == null)
+                if (!TryInitSlot(weaponsAmount, _weaponSlots[slotIndex], slotIndex))
                     continue;
 
-                _moduleSlots[index].SetIcon(_assetsProvider.GetModuleIcon(module.ModuleType));
+                var weaponType = _shipModel.WeaponTypes.TryGetValue(slotIndex, out var type) ? type : WeaponType.None;
+                SwitchEquipmentIcon(_weaponSlots[slotIndex].Index, EquipmentType.Weapon, (int)weaponType);
+            }
+        }
+
+        private async Task SetupModuleSlotsAsync(int modulesAmount)
+        {
+            await CheckSlotsAmountAsync(modulesAmount, _moduleSlots, _shipPanelView.ModuleSlotsContent, EquipmentType.Module);
+            
+            for (var slotIndex = 0; slotIndex < modulesAmount; slotIndex++)
+            {
+                if (!TryInitSlot(modulesAmount, _moduleSlots[slotIndex], slotIndex))
+                    continue;
+
+                var moduleType = _shipModel.ModuleTypes.TryGetValue(slotIndex, out var type) ? type : ModuleType.None;
+                SwitchEquipmentIcon(_moduleSlots[slotIndex].Index, EquipmentType.Module, (int)moduleType);
+            }
+        }
+
+        private void SwitchWeaponIcon(int slotIndex, WeaponType weaponType) 
+            => SwitchEquipmentIcon(slotIndex, EquipmentType.Weapon, (int)weaponType);
+
+        private void SwitchModuleIcon(int slotIndex, ModuleType moduleType) 
+            => SwitchEquipmentIcon(slotIndex, EquipmentType.Module, (int)moduleType);
+
+        private void SwitchEquipmentIcon(int slotIndex, EquipmentType type, int typeIndex)
+        {
+            SlotUiView slot = null;
+            Sprite icon = null;
+            switch (type)
+            {
+                case EquipmentType.Weapon:
+                    slot = _weaponSlots.FirstOrDefault(item => item.Index == slotIndex);
+                    if (_weaponIcons.ContainsKey((WeaponType)typeIndex)) 
+                        icon = _weaponIcons[(WeaponType)typeIndex];
+                    break;
+                case EquipmentType.Module:
+                    slot = _moduleSlots.FirstOrDefault(item => item.Index == slotIndex);
+                    if (_moduleIcons.ContainsKey((ModuleType)typeIndex)) 
+                        icon = _moduleIcons[(ModuleType)typeIndex];
+                    break;
+                default:
+                    Debug.LogError($"{this}: No icon for type {type.ToString()}");
+                    break;
+            }
+            if (slot != null)
+                slot.SetIcon(icon);
+        }
+
+        private async Task CheckSlotsAmountAsync(int amount, List<ShipSlotUiView> currentSlots,
+            Transform content, EquipmentType equipmentType)
+        {
+            currentSlots.ForEach(view => view.gameObject.SetActive(true));
+            
+            while (currentSlots.Count < amount)
+            {
+                var slot = await _uiFactory.CreateEquipmentUiSlotAsync(content);
+             
+                switch (equipmentType)
+                {
+                    case EquipmentType.Weapon:
+                        slot.SelectButton.onClick.AddListener(() => OnWeaponSelectClick?.Invoke(OpponentId, slot.Index));
+                        break;
+                    case EquipmentType.Module:
+                        slot.SelectButton.onClick.AddListener(() => OnModuleSelectClick?.Invoke(OpponentId, slot.Index));
+                        break;
+                    default:
+                        Debug.LogError($"{this}: Unknown equipment {equipmentType} for slot");
+                        return;
+                }
+                currentSlots.Add(slot);
             }
         }
 
@@ -139,7 +175,6 @@ namespace Ui.ShipSetup
         {
             if (index >= maxAmount)
             {
-                slot.SelectButton.onClick.RemoveAllListeners();
                 slot.gameObject.SetActive(false);
                 return false;
             }
@@ -147,23 +182,5 @@ namespace Ui.ShipSetup
             slot.Init(OpponentId, index);
             return true;
         }
-
-        private void CheckSlotsAmount(int amount, List<ShipSlotUiView> currentSlots, Transform content, out List<ShipSlotUiView> newSlots)
-        {
-            newSlots = new List<ShipSlotUiView>();
-            currentSlots.ForEach(view => view.gameObject.SetActive(true));
-            while (currentSlots.Count < amount)
-            {
-                var slot = _assetsProvider.CreateEquipmentUiSlot(content);
-                currentSlots.Add(slot);
-                newSlots.Add(slot);
-            }
-        }
-
-        private void InvokeWeaponSelect(int slotIndex)
-            => OnWeaponSelectClick?.Invoke(OpponentId, slotIndex);
-   
-        private void InvokeModuleSelect(int slotIndex)
-            => OnModuleSelectClick?.Invoke(OpponentId, slotIndex);
     }
 }

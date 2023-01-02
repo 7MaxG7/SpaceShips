@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Ui
 {
-    public class ShipSetupPanelView : MonoBehaviour
+    public sealed class ShipSetupPanelView : MonoBehaviour
     {
         [SerializeField] private OpponentId _opponentId;
         [SerializeField] private Transform _weaponSlotsContent;

@@ -9,7 +9,7 @@ using Zenject;
 
 namespace Services
 {
-    internal class LocationFinder : ILocationFinder
+    public sealed class LocationFinder : ILocationFinder
     {
         private readonly ISceneLoader _sceneLoader;
         private readonly RulesConfig _rulesConfig;
@@ -26,23 +26,27 @@ namespace Services
         {
             var sceneName = _sceneLoader.GetCurrentSceneName();
             rotation = default;
-            var sceneRule = _rulesConfig
-                .Opponents.FirstOrDefault(data => data.OpponentId == opponentId)?
-                .SpawnPositions.FirstOrDefault(data => data.SceneName == sceneName);
-            if (sceneRule == null)
-            {
-                Debug.LogError($"{this}: No spawn position in rules config for opponent {opponentId.ToString()} in scene {sceneName}");
-                var shipSpawnerMarker = Object.FindObjectsOfType<ShipSpawnerMarker>()
-                    .FirstOrDefault(data => data.OpponentId == opponentId);
-                if (shipSpawnerMarker == null)
-                    return null;
+            
+            var locationRule = _rulesConfig.GetSceneLocation(opponentId, sceneName)
+                               ?? FindLocationAtScene(opponentId, sceneName);
 
-                sceneRule = new SpawnPosition(sceneName);
-                sceneRule.UpdatePosition(shipSpawnerMarker.transform);
-            }
+            if (locationRule != null)
+                rotation = locationRule.Rotation;
+            return locationRule?.Position;
+        }
 
-            rotation = sceneRule.Rotation;
-            return sceneRule.Position;
+        private SpawnPosition FindLocationAtScene(OpponentId opponentId, string sceneName)
+        {
+            Debug.LogError($"{this}: No spawn position in rules config for opponent {opponentId.ToString()} in scene {sceneName}");
+            
+            var shipSpawnerMarker = Object.FindObjectsOfType<ShipSpawnerMarker>()
+                .FirstOrDefault(data => data.OpponentId == opponentId);
+            if (shipSpawnerMarker == null)
+                return null;
+
+            var sceneRule = new SpawnPosition(sceneName);
+            sceneRule.UpdatePosition(shipSpawnerMarker.transform);
+            return sceneRule;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure
 {
-    internal interface IUpdater : IUpdatable, ICleanable
+    public interface IUpdater : IUpdatable, ICleanable
     {
         void AddUpdatable(IUpdatable updatable);
         void RemoveController(IUpdatable updatable);

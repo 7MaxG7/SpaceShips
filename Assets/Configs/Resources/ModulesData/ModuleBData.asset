@@ -17,5 +17,9 @@ MonoBehaviour:
   _effectType: 2
   _mathType: 1
   _value: 50
-  _prefab: {fileID: 3241916203507007005, guid: 819631039aae11044b354e9be09102cc, type: 3}
+  _prefab:
+    m_AssetGUID: 819631039aae11044b354e9be09102cc
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
   _icon: {fileID: 21300000, guid: 884100f1270d2984e8c40c024ea59092, type: 3}

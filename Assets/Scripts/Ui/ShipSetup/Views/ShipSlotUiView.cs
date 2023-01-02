@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Ui.ShipSetup
 {
-    public class ShipSlotUiView : SlotUiView
+    public sealed class ShipSlotUiView : SlotUiView
     {
         [SerializeField] private SelectPanelAnchor[] _selectPanelAnchor;
         

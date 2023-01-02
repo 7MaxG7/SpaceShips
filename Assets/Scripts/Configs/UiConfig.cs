@@ -1,30 +1,29 @@
-﻿using Ui;
-using Ui.ShipSetup;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace Configs
 {
     [CreateAssetMenu(menuName = "Configs/" + nameof(UiConfig), fileName = nameof(UiConfig))]
     public class UiConfig : ScriptableObject
     {
-        [SerializeField] private Transform _rootCanvas;
+        [SerializeField] private AssetReference _rootCanvas;
         [SerializeField] private float _fadeAnimDuration;
         [Header("Curtain")]
-        [SerializeField] private CurtainView _curtainPrefab;
+        [SerializeField] private AssetReference _curtainPrefab;
         [SerializeField] private float _curtainAnimDuration;
         [Header("Ship setup scene")]
-        [SerializeField] private ShipSetupMenuView _shipSetupMenu;
-        [SerializeField] private SlotUiView _slotUiPrefab;
-        [SerializeField] private ShipSlotUiView _shipSlotUiPrefab;
+        [SerializeField] private AssetReference _shipSetupMenu;
+        [SerializeField] private AssetReference _slotUiPrefab;
+        [SerializeField] private AssetReference _shipSlotUiPrefab;
         [Header("Battle scene")]
-        [SerializeField] private BattleUiView _battleUiPrefab;
+        [SerializeField] private AssetReference _battleUiPrefab;
 
-        public ShipSetupMenuView ShipSetupMenu => _shipSetupMenu;
-        public ShipSlotUiView ShipSlotUiPrefab => _shipSlotUiPrefab;
-        public SlotUiView SlotUiPrefab => _slotUiPrefab;
-        public BattleUiView BattleUiPrefab => _battleUiPrefab;
-        public Transform RootCanvas => _rootCanvas;
-        public CurtainView CurtainPrefab => _curtainPrefab;
+        public AssetReference ShipSetupMenu => _shipSetupMenu;
+        public AssetReference ShipSlotUiPrefab => _shipSlotUiPrefab;
+        public AssetReference SlotUiPrefab => _slotUiPrefab;
+        public AssetReference BattleUiPrefab => _battleUiPrefab;
+        public AssetReference RootCanvas => _rootCanvas;
+        public AssetReference CurtainPrefab => _curtainPrefab;
         public float CurtainAnimDuration => _curtainAnimDuration;
         public float FadeAnimDuration => _fadeAnimDuration;
     }

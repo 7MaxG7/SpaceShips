@@ -3,15 +3,23 @@ using System.Collections;
 using Infrastructure;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Zenject;
 
 
 namespace Services
 {
     internal sealed class SceneLoader : ISceneLoader
     {
+        private readonly ICleaner _cleaner;
         private ICoroutineRunner _coroutineRunner;
 
 
+        [Inject]
+        public SceneLoader(ICleaner cleaner)
+        {
+            _cleaner = cleaner;
+        }
+        
         public void Init(ICoroutineRunner coroutineRunner)
         {
             _coroutineRunner = coroutineRunner;
@@ -31,6 +39,7 @@ namespace Services
                 yield break;
             }
 
+            _cleaner.SceneCleanUp();
             var loadSceneOperation = SceneManager.LoadSceneAsync(sceneName);
             while (!loadSceneOperation.isDone)
                 yield return new WaitForEndOfFrame();

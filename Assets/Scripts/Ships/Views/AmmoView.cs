@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Ships.Views
 {
-    public class AmmoView : MonoBehaviour
+    public sealed class AmmoView : MonoBehaviour
     {
         [SerializeField] private Rigidbody2D _rigidbody;
         

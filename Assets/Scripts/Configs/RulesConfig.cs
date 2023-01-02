@@ -1,4 +1,6 @@
-﻿using Configs.Data;
+﻿using System.Linq;
+using Configs.Data;
+using Enums;
 using UnityEngine;
 
 namespace Configs
@@ -9,5 +11,9 @@ namespace Configs
         [SerializeField] private Opponent[] _opponents;
 
         public Opponent[] Opponents => _opponents;
+
+        public SpawnPosition GetSceneLocation(OpponentId opponentId, string sceneName) 
+            => _opponents.FirstOrDefault(data => data.OpponentId == opponentId)?
+                .SpawnPositions.FirstOrDefault(data => data.SceneName == sceneName);
     }
 }

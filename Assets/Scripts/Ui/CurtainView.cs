@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Ui
 {
-    public class CurtainView : MonoBehaviour
+    public sealed class CurtainView : MonoBehaviour
     {
         [SerializeField] private CanvasGroup _canvasGroup;
 

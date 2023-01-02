@@ -19,4 +19,8 @@ MonoBehaviour:
   _shieldRecoveryInterval: 1
   _weaponSlotsAmount: 2
   _moduleSlotsAmount: 3
-  _prefab: {fileID: 6616281956063515882, guid: b218683e126883c4b9dd6ffb50ba2b0c, type: 3}
+  _prefab:
+    m_AssetGUID: b218683e126883c4b9dd6ffb50ba2b0c
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
