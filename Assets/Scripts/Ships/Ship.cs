@@ -32,7 +32,10 @@ namespace Ships
             Name = ShipType.ToString();
         }
 
-        public void CleanUp()
+        public void CleanUp() 
+            => SceneCleanUp();
+
+        public void SceneCleanUp()
         {
             ShipModules.OnModuleEquiped -= UpgradeShip;
             ShipModules.OnModuleUnequip -= DowngradeShip;

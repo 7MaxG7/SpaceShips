@@ -10,11 +10,15 @@ namespace Services
         private bool _isCleaned = true;
 
 
-        public void CleanUp()
+        public void CleanUp() 
+            => SceneCleanUp();
+
+        public void SceneCleanUp()
         {
             if (_isCleaned)
                 return;
             _isCleaned = true;
+            
             _ships.Clear();
         }
 

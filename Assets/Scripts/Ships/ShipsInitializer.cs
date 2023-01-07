@@ -44,6 +44,18 @@ namespace Ships
             Ships.Clear();
         }
 
+        public void SceneCleanUp()
+        {
+            foreach (var (opponentId, ship) in Ships)
+            {
+                ship.WeaponBattery.OnShoot -= _soundPlayer.PlayShoot;
+                _shipModels[opponentId].OnWeaponChange -= ship.WeaponBattery.SetEquipmentSync;
+                _shipModels[opponentId].OnModuleChange -= ship.ShipModules.SetEquipmentSync;
+                ship.SceneCleanUp();
+            }
+            Ships.Clear();
+        }
+
         public async Task PrepareShipsAsync()
         {
             _shipsFactory.PrepareRoot();

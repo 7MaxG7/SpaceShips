@@ -39,7 +39,7 @@ namespace Services
 
         public async Task<CurtainView> CreateCurtainAsync()
         {
-            var curtainView = await _assetsProvider.CreateInstanceAsync<CurtainView>(_uiConfig.CurtainPrefab);
+            var curtainView = await _assetsProvider.CreateInstanceAsync<CurtainView>(_uiConfig.CurtainPrefab, isDontDestroyAsset: true);
             curtainView.Init(_uiConfig.CurtainAnimDuration);
             return curtainView;
         }

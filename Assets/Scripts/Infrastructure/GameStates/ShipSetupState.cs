@@ -52,7 +52,7 @@ namespace Infrastructure
         public void Exit()
         {
             _shipSetupMenu.OnSetupComplete -= SwitchState;
-            _shipSetupMenu.CleanUp();
+            _shipSetupMenu.SceneCleanUp();
         }
 
         public void Init(IGameStateMachine stateMachine)

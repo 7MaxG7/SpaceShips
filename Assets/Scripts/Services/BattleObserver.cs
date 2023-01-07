@@ -21,7 +21,10 @@ namespace Services
             cleaner.AddCleanable(this);
         }
 
-        public void CleanUp()
+        public void CleanUp() 
+            => SceneCleanUp();
+
+        public void SceneCleanUp()
         {
             if (_isCleaned)
                 return;

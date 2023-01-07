@@ -18,7 +18,9 @@ namespace Services
         private readonly AssetsConfig _assetsConfig;
 
         private readonly Dictionary<string, AsyncOperationHandle> _loadedAssets = new();
+        private readonly Dictionary<string, AsyncOperationHandle> _loadedDontDestroyAssets = new();
         private readonly List<AsyncOperationHandle> _handles = new();
+        private readonly List<AsyncOperationHandle> _dontDestroyHandles = new();
         private bool _isCleaned;
 
 
@@ -31,6 +33,16 @@ namespace Services
         }
                 
         public void CleanUp()
+        {
+            SceneCleanUp();
+            
+            foreach (var handle in _dontDestroyHandles) 
+                Addressables.Release(handle);
+            _dontDestroyHandles.Clear();
+            _loadedDontDestroyAssets.Clear();
+        }
+
+        public void SceneCleanUp()
         {
             if (_isCleaned)
                 return;
@@ -55,13 +67,14 @@ namespace Services
                 await LoadAsync(reference);
         }
 
-        public async Task<T> CreateInstanceAsync<T>(AssetReference assetReference, Transform parent = null) where T : MonoBehaviour
-            => await CreateInstanceAsync<T>(assetReference, Vector3.zero, Quaternion.identity, parent, false);
+        public async Task<T> CreateInstanceAsync<T>(AssetReference assetReference,
+            Transform parent = null, bool isDontDestroyAsset = false) where T : MonoBehaviour
+            => await CreateInstanceAsync<T>(assetReference, Vector3.zero, Quaternion.identity, parent, false, isDontDestroyAsset);
 
         public async Task<T> CreateInstanceAsync<T>(AssetReference assetReference, Vector3 position, Quaternion rotation
-            , Transform parent = null, bool isPositioned = true) where T : MonoBehaviour
+            , Transform parent = null, bool isPositioned = true, bool isDontDestroyAsset = false) where T : MonoBehaviour
         {
-            var prefab = await LoadAsync(assetReference);
+            var prefab = await LoadAsync(assetReference, isDontDestroyAsset);
             return isPositioned
                 ? Instantiate(prefab, position, rotation, parent).GetComponent<T>()
                 : Instantiate(prefab, parent).GetComponent<T>();
@@ -73,18 +86,20 @@ namespace Services
             return Instantiate(prefab, parent);
         }
 
-        private async Task<GameObject> LoadAsync(AssetReference assetReference)
+        private async Task<GameObject> LoadAsync(AssetReference assetReference, bool isDontDestroyAsset = false)
         {
             _isCleaned = false;
+            var loadedAssets = isDontDestroyAsset ? _loadedDontDestroyAssets : _loadedAssets;
+            var handles = isDontDestroyAsset ? _dontDestroyHandles : _handles;
             
-            if (_loadedAssets.TryGetValue(assetReference.AssetGUID, out var loadedHandle))
+            if (loadedAssets.TryGetValue(assetReference.AssetGUID, out var loadedHandle))
                 return loadedHandle.Result as GameObject;
             
             var handle = Addressables.LoadAssetAsync<GameObject>(assetReference);
             handle.Completed += resultHandle =>
             {
-                _loadedAssets[assetReference.AssetGUID] = resultHandle;
-                _handles.Add(handle);
+                loadedAssets[assetReference.AssetGUID] = resultHandle;
+                handles.Add(handle);
             };
             return await handle.Task;
         }

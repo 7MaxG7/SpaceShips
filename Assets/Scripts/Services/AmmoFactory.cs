@@ -29,7 +29,10 @@ namespace Services
             cleaner.AddCleanable(this);
         }
 
-        public void CleanUp()
+        public void CleanUp() 
+            => SceneCleanUp();
+
+        public void SceneCleanUp()
         {
             foreach (var pool in _ammoPools.Values) 
                 pool.CleanUp();

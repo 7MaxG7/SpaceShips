@@ -6,7 +6,7 @@ namespace Infrastructure
     internal sealed class Cleaner : ICleaner
     {
         private readonly List<ICleanable> _cleanables = new();
-        private readonly List<ICleanable> _sceneCleanables = new();
+        private readonly List<ISceneCleanable> _sceneCleanables = new();
         
 
         public void AddCleanable(ICleanable cleanable)
@@ -23,18 +23,18 @@ namespace Infrastructure
                 _sceneCleanables.Remove(sceneCleanable);
         }
 
+        public void SceneCleanUp()
+        {
+            foreach (var cleanable in _sceneCleanables)
+                cleanable.SceneCleanUp();
+        }
+
         public void CleanUp()
         {
             foreach (var cleanable in _cleanables)
                 cleanable.CleanUp();
             _cleanables.Clear();
             DOTween.Clear();
-        }
-
-        public void SceneCleanUp()
-        {
-            foreach (var cleanable in _sceneCleanables)
-                cleanable.CleanUp();
         }
     }
 }

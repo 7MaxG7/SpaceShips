@@ -34,7 +34,10 @@ namespace Ui.ShipSetup.Controllers
             _shipModels = shipModels;
         }
 
-        public void CleanUp()
+        public void CleanUp() 
+            => SceneCleanUp();
+
+        public void SceneCleanUp()
         {
             foreach (var panel in _shipPanels.Values)
             {

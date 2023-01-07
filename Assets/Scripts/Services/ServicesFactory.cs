@@ -20,6 +20,6 @@ namespace Services
         }
 
         public async Task<SoundPlayerView> CreateSoundPlayerAsync() 
-            => await _assetsProvider.CreateInstanceAsync<SoundPlayerView>(_soundConfig.SoundPlayerPrefab);
+            => await _assetsProvider.CreateInstanceAsync<SoundPlayerView>(_soundConfig.SoundPlayerPrefab, isDontDestroyAsset: true);
     }
 }
